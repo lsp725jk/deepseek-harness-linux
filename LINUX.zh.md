@@ -4,7 +4,7 @@
 
 ## 直接使用（Ubuntu / Debian）
 
-下载发布页的 AppImage 或 deb：
+从 [GitHub Release](https://github.com/lsp725jk/deepseek-harness-linux/releases/tag/v0.2.1-rc.2-linux) 下载 AppImage 或 deb：
 
 ```sh
 # AppImage
