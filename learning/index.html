@@ -211,6 +211,51 @@ details.answer-box summary { cursor: pointer; font-weight: 700; color: var(--acc
 details.answer-box[open] { padding-bottom: 16px; }
 .footer { color: var(--muted); font-size: 12px; text-align: center; padding: 26px 0 0; }
 .kbd { font-family: monospace; background: var(--bg-soft); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; font-size: .85em; }
+
+.term-toolbar {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px;
+  margin: 20px 0 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--bg-soft);
+}
+.term-toolbar label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+.term-toolbar input {
+  width: min(480px, 72vw); border: 1px solid var(--line); border-radius: 9px;
+  padding: 8px 10px; background: var(--panel); color: var(--ink); font: inherit; font-size: 13px;
+}
+.term-toolbar input:focus { outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent); border-color: var(--accent); }
+#term-count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.term-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
+.term-card {
+  border: 1px solid var(--line); border-radius: 16px; background: var(--panel);
+  padding: 16px; box-shadow: 0 8px 20px rgba(22,32,51,.045); scroll-margin-top: 20px;
+}
+.term-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.term-index {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px;
+  display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  color: var(--accent); font-weight: 800; font-size: 11px;
+}
+.term-title { min-width: 0; flex: 1; }
+.term-title h3 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
+.term-title h3 small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; margin-top: 2px; }
+.term-oneline { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+.term-group {
+  flex: 0 0 auto; border-radius: 99px; padding: 3px 8px; font-size: 10px;
+  color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 11%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 25%, var(--line));
+}
+.term-fields { display: grid; gap: 8px; }
+.term-field { border-top: 1px dashed var(--line); padding-top: 8px; }
+.term-field:first-child { border-top: 0; padding-top: 0; }
+.term-label { display: block; font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--accent); text-transform: uppercase; margin-bottom: 2px; }
+.term-field p { margin: 0; font-size: 12.5px; line-height: 1.6; }
+.term-where p { font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace; font-size: 11.5px; color: var(--muted); word-break: break-word; }
+.term-warn { background: color-mix(in srgb, var(--warning) 7%, transparent); border-radius: 8px; padding: 7px 8px; }
+.term-warn .term-label { color: var(--warning); }
+.term-empty { color: var(--muted); text-align: center; padding: 18px; }
+[hidden] { display: none !important; }
+@media (max-width: 900px) { .term-grid { grid-template-columns: 1fr; } .term-toolbar input { width: 100%; } }
+
 @media (max-width: 900px) {
   :root { --sidebar: 0px; }
   .app { display: block; }
@@ -269,6 +314,7 @@ details.answer-box[open] { padding-bottom: 16px; }
       <section class="section" id="overview" data-section="overview"><div class="chapter"><div class="chapter-left"><div class="chapter-num">00</div><div><h2>课程地图</h2><p>先读这一页，再按顺序进入三个模块</p></div></div><button class="btn done-btn" type="button" data-done="overview">标记完成</button></div><div class="quiz-card" id="diagnostic"><h2>开课前：5 题诊断</h2><p class="hint">不查资料，写 1–2 句话即可；答案保存在本机浏览器，不会上传。</p><div class="q"><label for="diag-1">1. Turn 和 Step 的区别？一个 turn 可以有几个 step？</label><textarea id="diag-1" data-diag="1" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-2">2. Profile、Bundle、Patch 谁覆盖谁？覆盖 config 是深合并还是替换？</label><textarea id="diag-2" data-diag="2" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-3">3. Plugin、Service、Tool 三者关系？各举一个 DSH 例子。</label><textarea id="diag-3" data-diag="3" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-4">4. Host 和 Client 的边界？Desktop Host 与 Electron main 的区别？</label><textarea id="diag-4" data-diag="4" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-5">5. 新增只读查数据库工具，先改 core 还是扩展点？最小文件清单是什么？</label><textarea id="diag-5" data-diag="5" placeholder="你的回答…"></textarea></div><div class="row-actions"><button class="btn primary" type="button" onclick="saveAnswers()">保存答案</button><button class="btn" type="button" onclick="exportAnswers()">复制 / 下载为 Markdown</button><span class="status" id="answer-status">未保存</span></div></div><div class="content">
 <blockquote>
 <p><strong>用户阅读版（推荐）：<a href="index.html">index.html</a></strong> — 自包含 HTML，带目录、进度、答题卡和答案导出；下面这些 Markdown 是 Agent/仓库维护用的源文件。</p>
+<p>在线版：<a href="https://lsp725jk.github.io/deepseek-harness-linux/">https://lsp725jk.github.io/deepseek-harness-linux/</a>。术语详解的源数据在 <code>terminology.json</code>；修改后先运行 <code>python learning/build-terminology.py</code>，再运行 <code>python learning/build-html.py</code> 重新生成 HTML，并把 <code>index.html</code> 同步到 <code>gh-pages</code> 分支的根目录。</p>
 </blockquote>
 <p>这是一套面向开发者的三模块课程：先建立术语，再建立架构地图，最后读代码并做小改动；学完后用迁移测试检验是否真的理解，而不是记住结论。</p>
 <h2>适合谁</h2>
@@ -323,6 +369,7 @@ details.answer-box[open] { padding-bottom: 16px; }
 <li><a href="#m3">03-code-implementation.zh.md</a>：源码阅读路线和小练习。</li>
 <li><a href="#m4">04-transfer-assessment.zh.md</a>：迁移测试题目与评分标准。</li>
 <li><a href="#answers">answer-key.zh.md</a>：参考答案；建议做完再打开。</li>
+<li><a href="terminology.json">terminology.json</a>：43 个术语的结构化详解源（官方定义/用途/原理/范围/混淆/验证）。</li>
 </ul>
 <h2>重要原则</h2>
 <ul>
@@ -334,6 +381,9 @@ details.answer-box[open] { padding-bottom: 16px; }
 <h2>开始之前</h2>
 <p>先做 <a href="#m4">04-transfer-assessment.zh.md</a> 的“诊断 8 题”，把答案留在手边；学完三个模块后再做一次，对比两次答案。诊断不计分，只用来定位你的起点。</p></div></section><section class="section" id="m1" data-section="m1"><div class="chapter"><div class="chapter-left"><div class="chapter-num">01</div><div><h2>专业术语</h2><p>先把词用对：Turn、Step、Plugin、Service、Tool、Profile、Bundle、Patch</p></div></div><button class="btn done-btn" type="button" data-done="m1">标记完成</button></div><div class="content">
 <p>目标：看到 DSH 的文档、日志或代码时，能准确说出每个词指的是哪一层，不把“插件、服务、工具、bundle”混成一类。</p>
+<blockquote>
+<p>先看速查表建立边界；后半部分有 43 个术语的逐条详解（官方/仓库定义、用途、原理、作用范围、常见混淆、验证）。HTML 版会把它渲染成可搜索卡片。</p>
+</blockquote>
 <h2>1. 运行时与执行</h2>
 <table>
 <thead>
@@ -663,6 +713,490 @@ details.answer-box[open] { padding-bottom: 16px; }
 </tbody>
 </table>
 <p><strong>易错</strong>：Projection 不是事实源；它从 Session 日志派生。日志才是可以重放的事实。</p>
+<h2>术语详解</h2>
+<div class="term-toolbar">
+<div><label for="term-search">搜索术语</label>
+<input id="term-search" type="search" placeholder="术语、职责、路径、易混点…" autocomplete="off"></div>
+<span id="term-count">43 个术语</span>
+</div>
+<div class="term-grid" id="term-grid">
+<article class="term-card" id="term-harness" data-search="agent harness / dsh（智能体运行框架） agent harness 总览 把模型、工具、会话、上下文和插件树装配起来的运行时；dsh 本身不是模型。 仓库 readme/architecture：deepseek harness 是开源 agent harness，基于 everything-is-a-plugin 的 cordis；web/desktop/cli/sdk/acp 共用同一套 base 与 core。 让模型具备可组合的工具、持久会话、上下文管理、权限/沙箱和多载体交付能力。 cordis 插件树提供服务；agent loop 驱动模型/工具；session 日志作为事实源；profile/bundle 负责装配。 harness 包含运行时与编排层，不等于模型、ui 或单个 agent；具体供应商/工具通过扩展点接入。 仓库根 readme；docs/architecture.md；apps/cli；packages/core；packages/bundle。 把 dsh 当成一个模型或聊天壳；它是运行时/装配框架。 读 docs/architecture.md 并运行 dsh --profile web --dump-config。">
+<div class="term-head"><div class="term-index">01</div><div class="term-title"><h3>Agent Harness / DSH（智能体运行框架） <small>agent harness</small></h3><p class="term-oneline">把模型、工具、会话、上下文和插件树装配起来的运行时；DSH 本身不是模型。</p></div><span class="term-group">总览</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库 README/architecture：DeepSeek Harness 是开源 agent harness，基于 everything-is-a-plugin 的 Cordis；Web/Desktop/CLI/SDK/ACP 共用同一套 base 与 core。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让模型具备可组合的工具、持久会话、上下文管理、权限/沙箱和多载体交付能力。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Cordis 插件树提供服务；Agent Loop 驱动模型/工具；Session 日志作为事实源；profile/bundle 负责装配。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Harness 包含运行时与编排层，不等于模型、UI 或单个 Agent；具体供应商/工具通过扩展点接入。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>仓库根 README；docs/architecture.md；apps/cli；packages/core；packages/bundle。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 DSH 当成一个模型或聊天壳；它是运行时/装配框架。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>读 docs/architecture.md 并运行 dsh --profile web --dump-config。</p></div>
+</div></article>
+<article class="term-card" id="term-turn" data-search="turn（轮） turn 执行 一次被接纳输入的完整排空过程，从 turn/start 到 turn/end。 dsh glossary（docs/glossary.md#loop-hierarchy）：one drain of admitted input in a session, ending after the model and its tools stop or a terminal policy intervenes. 把一次用户可见请求与中间的多次模型/工具往返包成一个可取消、可审计、可恢复的生命周期。 agent loop 在空闲时从 inbox 取输入，开启 turn；内部按 step 循环；完成、取消或失败都写 turn/end。 一个 turn 含 0..n 个 step；不同 turn 之间有 turn/end 边界；它不是单次模型请求。 packages/core/agent-loop/src/agent.ts 的 turn()；session 事件 turn/start、turn/end。 把 turn 当成一次 llm 请求；实际一次请求只是 step。 在 session 日志里数 turn/start 与 step/start；一个 turn 可以有多条 step/start。">
+<div class="term-head"><div class="term-index">02</div><div class="term-title"><h3>Turn（轮） <small>turn</small></h3><p class="term-oneline">一次被接纳输入的完整排空过程，从 turn/start 到 turn/end。</p></div><span class="term-group">执行</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>DSH glossary（docs/glossary.md#loop-hierarchy）：one drain of admitted input in a session, ending after the model and its tools stop or a terminal policy intervenes.</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把一次用户可见请求与中间的多次模型/工具往返包成一个可取消、可审计、可恢复的生命周期。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Agent Loop 在空闲时从 inbox 取输入，开启 turn；内部按 step 循环；完成、取消或失败都写 turn/end。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>一个 turn 含 0..N 个 step；不同 turn 之间有 turn/end 边界；它不是单次模型请求。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/agent-loop/src/agent.ts 的 turn()；Session 事件 turn/start、turn/end。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 turn 当成一次 LLM 请求；实际一次请求只是 step。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>在 Session 日志里数 turn/start 与 step/start；一个 turn 可以有多条 step/start。</p></div>
+</div></article>
+<article class="term-card" id="term-step" data-search="step（步） step 执行 一次模型请求及其引发的工具执行；turn 的下一层调度单位。 dsh glossary（docs/glossary.md#loop-hierarchy）：one model request plus the tool executions caused by its response; a turn contains zero or more steps. 把“请求模型 + 执行它要求的工具”作为可重试、可中断、可观测的最小单元。 组装 prompt/tool schema → 请求 → 流式 assistant → 工具调用 → 工具结果 → step/end；有工具结果或新输入时进入下一个 step。 一个 step 只对应一次模型请求；工具阶段属于该 step；step 不等于工具调用。 agent-loop/src/agent.ts 的 step()；step/start、step/end、tool/call、tool/result 事件。 把 step 当成“一次工具调用”；一个 step 可以没有工具，也可以有多个工具调用。 观察 turn/start → step/start → tool/call → tool/result → step/end 的顺序。">
+<div class="term-head"><div class="term-index">03</div><div class="term-title"><h3>Step（步） <small>step</small></h3><p class="term-oneline">一次模型请求及其引发的工具执行；turn 的下一层调度单位。</p></div><span class="term-group">执行</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>DSH glossary（docs/glossary.md#loop-hierarchy）：one model request plus the tool executions caused by its response; a turn contains zero or more steps.</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把“请求模型 + 执行它要求的工具”作为可重试、可中断、可观测的最小单元。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>组装 prompt/tool schema → 请求 → 流式 assistant → 工具调用 → 工具结果 → step/end；有工具结果或新输入时进入下一个 step。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>一个 step 只对应一次模型请求；工具阶段属于该 step；step 不等于工具调用。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>agent-loop/src/agent.ts 的 step()；step/start、step/end、tool/call、tool/result 事件。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 step 当成“一次工具调用”；一个 step 可以没有工具，也可以有多个工具调用。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>观察 turn/start → step/start → tool/call → tool/result → step/end 的顺序。</p></div>
+</div></article>
+<article class="term-card" id="term-session" data-search="session（会话） session 持久化 一次对话的 append-only 事件日志，是恢复、回放和投影的事实源。 仓库定义（按 packages/core/session 与 docs/architecture.md 归纳）：由 session 服务管理的持久化事件历史，带 sessionid、序号和格式版本。 让模型消息、工具历史、生命周期和 ui 投影都能从同一份日志重建。 session.append 写入类型化事件；derivemessages 从事件生成模型消息；persistence 写 jsonl，query/projection 建读模型。 session 是会话事实，不是项目/工作目录；一个 agent 绑定一个 session，子 agent 有独立 session。 packages/core/session；packages/session/session-persistence-jsonl；packages/session/session-projection。 把 session 当成 workspace 或前端 store；session 是日志，workspace 是文件系统/项目范围。 查看会话 .jsonl；用 snapshotevents() 断言事件序列。">
+<div class="term-head"><div class="term-index">04</div><div class="term-title"><h3>Session（会话） <small>session</small></h3><p class="term-oneline">一次对话的 append-only 事件日志，是恢复、回放和投影的事实源。</p></div><span class="term-group">持久化</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（按 packages/core/session 与 docs/architecture.md 归纳）：由 Session 服务管理的持久化事件历史，带 SessionId、序号和格式版本。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让模型消息、工具历史、生命周期和 UI 投影都能从同一份日志重建。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Session.append 写入类型化事件；deriveMessages 从事件生成模型消息；persistence 写 JSONL，query/projection 建读模型。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Session 是会话事实，不是项目/工作目录；一个 Agent 绑定一个 Session，子 Agent 有独立 Session。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/session；packages/session/session-persistence-jsonl；packages/session/session-projection。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Session 当成 workspace 或前端 store；Session 是日志，workspace 是文件系统/项目范围。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>查看会话 .jsonl；用 snapshotEvents() 断言事件序列。</p></div>
+</div></article>
+<article class="term-card" id="term-event-log" data-search="sessionevent 与 model-visible ⟺ logged session event / logged invariant 持久化 任何进入模型请求的内容都必须能从 session 日志重建；日志专用事件不进入模型上下文。 仓库不变式（docs/architecture.md）：模型可见的输入必须可从 session 日志重建；log-only 事件由 derivemessages 忽略。 保证恢复、回放、压缩、审计、fork 不会悄悄改变模型看到的内容。 事件是持久化事实；模型消息由读取路径派生；payload 必须是可 json 持久化的值；log-only 事件只服务 ui/审计。 适用于 prompt/context 注入、工具结果、请求头等模型可见内容；纯 ui 临时状态不必写日志。 packages/core/session/src/types.ts；known-event-types.ts；agent-loop 的 derive/prepare 路径。 只在内存里拼一段 prompt、不写事件；刷新或恢复后模型看到的内容会变。 恢复同一 session 后重新 derivemessages，比较请求头和消息是否一致。">
+<div class="term-head"><div class="term-index">05</div><div class="term-title"><h3>SessionEvent 与 model-visible ⟺ logged <small>session event / logged invariant</small></h3><p class="term-oneline">任何进入模型请求的内容都必须能从 Session 日志重建；日志专用事件不进入模型上下文。</p></div><span class="term-group">持久化</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库不变式（docs/architecture.md）：模型可见的输入必须可从 Session 日志重建；log-only 事件由 deriveMessages 忽略。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>保证恢复、回放、压缩、审计、fork 不会悄悄改变模型看到的内容。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>事件是持久化事实；模型消息由读取路径派生；payload 必须是可 JSON 持久化的值；log-only 事件只服务 UI/审计。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>适用于 prompt/context 注入、工具结果、请求头等模型可见内容；纯 UI 临时状态不必写日志。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/session/src/types.ts；known-event-types.ts；agent-loop 的 derive/prepare 路径。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>只在内存里拼一段 prompt、不写事件；刷新或恢复后模型看到的内容会变。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>恢复同一 Session 后重新 deriveMessages，比较请求头和消息是否一致。</p></div>
+</div></article>
+<article class="term-card" id="term-profile" data-search="profile（配置档） profile 装配 位于 $dsh_home/profiles/&lt;name&gt;/ 的命名运行配置，选择 bundle 并叠加自己的 patch。 仓库定义（按 apps/cli 与 packages/boot 归纳）：profile 目录包含 package.json（dsh.profile.bundles 有序列表）与 cordis.patch.yml（用户覆盖层）。 让同一套代码以 web、desktop、headless、sdk 等不同组合运行，而不复制核心。 cli --profile 选择目录；app-boot 读取 bundle 列表，按顺序合并 patch；最后应用 profile patch 和命令行 overlay。 profile 是装配结果，不是用户设置页面；一个进程加载一个 profile；它不等于 npm package。 apps/cli/src/profile-boot.ts；packages/boot/app-boot/src/profile.ts；~/.dsh/profiles/&lt;name&gt;/。 把 profile 当成“用户偏好设置”或“插件包”；它是运行配置组合。 dsh --profile web --dump-config，查看最终组合树。">
+<div class="term-head"><div class="term-index">06</div><div class="term-title"><h3>Profile（配置档） <small>profile</small></h3><p class="term-oneline">位于 $DSH_HOME/profiles/&lt;name&gt;/ 的命名运行配置，选择 bundle 并叠加自己的 patch。</p></div><span class="term-group">装配</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（按 apps/cli 与 packages/boot 归纳）：profile 目录包含 package.json（dsh.profile.bundles 有序列表）与 cordis.patch.yml（用户覆盖层）。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让同一套代码以 web、desktop、headless、SDK 等不同组合运行，而不复制核心。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>CLI --profile 选择目录；app-boot 读取 bundle 列表，按顺序合并 patch；最后应用 profile patch 和命令行 overlay。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Profile 是装配结果，不是用户设置页面；一个进程加载一个 profile；它不等于 npm package。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>apps/cli/src/profile-boot.ts；packages/boot/app-boot/src/profile.ts；~/.dsh/profiles/&lt;name&gt;/。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Profile 当成“用户偏好设置”或“插件包”；它是运行配置组合。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>dsh --profile web --dump-config，查看最终组合树。</p></div>
+</div></article>
+<article class="term-card" id="term-bundle" data-search="bundle（配置束） bundle 装配 以 npm 包分发的一组 cordis 配置行，通过 package.json 的 dsh.bundle 指向 patch 文件。 仓库定义（packages/bundle/readme.md）：bundle 提供可复用的配置行，profile 按需选择并按顺序应用。 把共享底座（base）、载体（web-app/headless）和配置从核心代码中解耦，便于组合与发布。 bundle 的 cordis.patch.yml 用 insert/update/remove 行描述树；应用后行进入 loader 配置。 bundle 是配置分发单位，不是运行中的插件实例；一个 profile 可加载多个 bundle。 packages/bundle/base、web-app、headless、sdk-app、acp-app 的 cordis.patch.yml。 把 bundle 等同于 npm 包本身；npm 包只是载体，bundle 是其中的配置入口。 查看 package.json 的 dsh.bundle 字段和 patch 内容。">
+<div class="term-head"><div class="term-index">07</div><div class="term-title"><h3>Bundle（配置束） <small>bundle</small></h3><p class="term-oneline">以 npm 包分发的一组 Cordis 配置行，通过 package.json 的 dsh.bundle 指向 patch 文件。</p></div><span class="term-group">装配</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/bundle/README.md）：bundle 提供可复用的配置行，profile 按需选择并按顺序应用。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把共享底座（base）、载体（web-app/headless）和配置从核心代码中解耦，便于组合与发布。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>bundle 的 cordis.patch.yml 用 insert/update/remove 行描述树；应用后行进入 Loader 配置。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Bundle 是配置分发单位，不是运行中的插件实例；一个 profile 可加载多个 bundle。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/bundle/base、web-app、headless、sdk-app、acp-app 的 cordis.patch.yml。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Bundle 等同于 npm 包本身；npm 包只是载体，bundle 是其中的配置入口。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>查看 package.json 的 dsh.bundle 字段和 patch 内容。</p></div>
+</div></article>
+<article class="term-card" id="term-patch" data-search="patch / overlay（覆盖层） patch / overlay 装配 按 id 定位 cordis 行的 yaml 覆盖层；后写覆盖前写，config 整段替换。 仓库定义（packages/bundle/*/cordis.patch.yml 与 docs/architecture.md）：patch 通过 id 覆盖目标行；不是深合并。 在不改上游代码的情况下替换/调整配置，支持 profile 定制和命令行实验。 多个 patch 按 bundle → profile → user → cli 顺序合成；同 id 最后写入者生效；行内 config 被完整替换。 只影响目标 id 行；未写的字段不会从旧层继承；覆盖不等于新增插件代码。 bundle patch、profile 的 cordis.patch.yml、$dsh_home/cordis.patch.yml、--patch 参数。 以为 config 会深合并；实际整段替换，所以覆盖层要写全字段。 用 --dump-config 比较覆盖前后的同一行。">
+<div class="term-head"><div class="term-index">08</div><div class="term-title"><h3>Patch / Overlay（覆盖层） <small>patch / overlay</small></h3><p class="term-oneline">按 id 定位 Cordis 行的 YAML 覆盖层；后写覆盖前写，config 整段替换。</p></div><span class="term-group">装配</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/bundle/*/cordis.patch.yml 与 docs/architecture.md）：patch 通过 id 覆盖目标行；不是深合并。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>在不改上游代码的情况下替换/调整配置，支持 profile 定制和命令行实验。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>多个 patch 按 bundle → profile → user → CLI 顺序合成；同 id 最后写入者生效；行内 config 被完整替换。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>只影响目标 id 行；未写的字段不会从旧层继承；覆盖不等于新增插件代码。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>bundle patch、profile 的 cordis.patch.yml、$DSH_HOME/cordis.patch.yml、--patch 参数。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>以为 config 会深合并；实际整段替换，所以覆盖层要写全字段。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>用 --dump-config 比较覆盖前后的同一行。</p></div>
+</div></article>
+<article class="term-card" id="term-loader" data-search="loader（加载器） loader 装配 cordis 的配置加载器：解析行、按服务可用性与 inject 激活插件、管理 fiber 生命周期。 仓库定义（vendor/cordis + app-boot）：loader 驱动 cordis 插件树直到稳定；激活顺序由依赖/服务可用性决定。 把静态 patch 变成运行中的服务图，并支持 hmr/卸载。 loader 读取配置行，创建插件 fiber；插件声明 inject，等待服务出现；注册通过 effect 回滚。 loader 不按 yaml 行顺序加载；配置覆盖在加载前已经完成；它不等于插件代码本身。 vendor/cordis；@deepseek-ai/cordis-plugin-loader；packages/boot/app-boot/src/index.ts。 认为行顺序就是启动顺序；实际是由服务可用性驱动。 看 loader 日志/启动顺序；在 dump-config 中观察 inject 依赖。">
+<div class="term-head"><div class="term-index">09</div><div class="term-title"><h3>Loader（加载器） <small>loader</small></h3><p class="term-oneline">Cordis 的配置加载器：解析行、按服务可用性与 inject 激活插件、管理 fiber 生命周期。</p></div><span class="term-group">装配</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（vendor/cordis + app-boot）：Loader 驱动 Cordis 插件树直到稳定；激活顺序由依赖/服务可用性决定。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把静态 patch 变成运行中的服务图，并支持 HMR/卸载。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Loader 读取配置行，创建插件 fiber；插件声明 inject，等待服务出现；注册通过 effect 回滚。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Loader 不按 YAML 行顺序加载；配置覆盖在加载前已经完成；它不等于插件代码本身。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>vendor/cordis；@deepseek-ai/cordis-plugin-loader；packages/boot/app-boot/src/index.ts。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>认为行顺序就是启动顺序；实际是由服务可用性驱动。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>看 Loader 日志/启动顺序；在 dump-config 中观察 inject 依赖。</p></div>
+</div></article>
+<article class="term-card" id="term-plugin" data-search="plugin（插件） plugin 组合 可加载/卸载的 cordis 模块，通常导出 name、inject、config、apply；服务包可默认导出服务类。 仓库约定（packages/agents.md）：函数插件命名导出 name/inject/config/apply，服务包默认导出服务类；混合形式会让 loader 丢弃命名空间。 把能力拆成可组合、可替换、可回滚的单元。 loader 调用 apply(ctx, config)；插件在 ctx 上注册服务、工具、监听器；fiber 卸载时 effect 回滚。 一个插件可注册多个能力；插件不等于 service，也不等于 tool。 packages/*/*/src/index.ts；apps/desktop-host；packages/client/ui-*。 把 plugin 等同于 tool；工具只是插件可能注册的一个模型能力。 加载/卸载插件，观察服务或工具是否随之出现/消失。">
+<div class="term-head"><div class="term-index">10</div><div class="term-title"><h3>Plugin（插件） <small>plugin</small></h3><p class="term-oneline">可加载/卸载的 Cordis 模块，通常导出 name、inject、Config、apply；服务包可默认导出服务类。</p></div><span class="term-group">组合</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库约定（packages/AGENTS.md）：函数插件命名导出 name/inject/Config/apply，服务包默认导出服务类；混合形式会让 Loader 丢弃命名空间。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把能力拆成可组合、可替换、可回滚的单元。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Loader 调用 apply(ctx, config)；插件在 ctx 上注册服务、工具、监听器；fiber 卸载时 effect 回滚。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>一个插件可注册多个能力；插件不等于 Service，也不等于 Tool。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/*/*/src/index.ts；apps/desktop-host；packages/client/ui-*。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Plugin 等同于 Tool；工具只是插件可能注册的一个模型能力。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>加载/卸载插件，观察服务或工具是否随之出现/消失。</p></div>
+</div></article>
+<article class="term-card" id="term-service" data-search="service（服务） service 组合 挂在 ctx 上的共享能力对象，例如 ctx.tools、ctx.sessions、ctx.llm。 仓库定义（cordis + docs/architecture.md）：服务是插件之间通过 ctx 使用的能力接口，由 service definition/provider/consumer 构成能力接缝。 让插件通过能力接口解耦，而不是互相 import 具体实现。 provider 注册服务；consumer 通过 inject 声明依赖并使用 ctx.&lt;service&gt;；服务生命周期随 fiber/effect 管理。 服务是共享能力；tool 是服务的一种消费者/注册项；service 不等于 plugin。 ctx.tools、ctx.llm、ctx.sessions、ctx.shell、ctx.fs、ctx.sandbox。 把 service 当成某个具体工具或插件；服务是能力接口/对象。 在插件的 inject 中声明服务；dump-config 查看依赖。">
+<div class="term-head"><div class="term-index">11</div><div class="term-title"><h3>Service（服务） <small>service</small></h3><p class="term-oneline">挂在 ctx 上的共享能力对象，例如 ctx.tools、ctx.sessions、ctx.llm。</p></div><span class="term-group">组合</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（Cordis + docs/architecture.md）：服务是插件之间通过 ctx 使用的能力接口，由 Service Definition/Provider/Consumer 构成能力接缝。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让插件通过能力接口解耦，而不是互相 import 具体实现。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Provider 注册服务；Consumer 通过 inject 声明依赖并使用 ctx.&lt;service&gt;；服务生命周期随 fiber/effect 管理。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>服务是共享能力；Tool 是服务的一种消费者/注册项；Service 不等于 Plugin。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>ctx.tools、ctx.llm、ctx.sessions、ctx.shell、ctx.fs、ctx.sandbox。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Service 当成某个具体工具或插件；服务是能力接口/对象。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>在插件的 inject 中声明服务；dump-config 查看依赖。</p></div>
+</div></article>
+<article class="term-card" id="term-capability-seam" data-search="capability seam（能力接缝） capability seam 组合 一个可替换能力的三角色整体：service definition、provider、consumer。 dsh glossary（docs/glossary.md#capability-seam）：seam 是带三角色的可替换能力；它永远不是单个角色，保留给完整能力使用。 在不改 consumer 的前提下替换 provider，并把策略/平台差异隔离在能力边界。 definition 定义服务与语义；provider 实现平台/后端；consumer 注入服务；loader 按可用性装配。 适用于可替换能力（shell、sandbox、fs、llm 等）；不是任何 interface 或任意依赖都叫 seam。 packages/shell（definition）、bash-local/bash-sandbox（providers）、tool-bash（consumer）。 把 seam 说成单个 service/interface；seam 是完整能力，单个角色应叫 definition/provider/consumer。 画出一个能力的 definition/provider/consumer 三角色，并替换 provider 跑测试。">
+<div class="term-head"><div class="term-index">12</div><div class="term-title"><h3>Capability Seam（能力接缝） <small>capability seam</small></h3><p class="term-oneline">一个可替换能力的三角色整体：Service Definition、Provider、Consumer。</p></div><span class="term-group">组合</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>DSH glossary（docs/glossary.md#capability-seam）：seam 是带三角色的可替换能力；它永远不是单个角色，保留给完整能力使用。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>在不改 Consumer 的前提下替换 Provider，并把策略/平台差异隔离在能力边界。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Definition 定义服务与语义；Provider 实现平台/后端；Consumer 注入服务；Loader 按可用性装配。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>适用于可替换能力（shell、sandbox、fs、llm 等）；不是任何 interface 或任意依赖都叫 seam。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/shell（Definition）、bash-local/bash-sandbox（Providers）、tool-bash（Consumer）。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 seam 说成单个 Service/interface；seam 是完整能力，单个角色应叫 Definition/Provider/Consumer。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>画出一个能力的 Definition/Provider/Consumer 三角色，并替换 Provider 跑测试。</p></div>
+</div></article>
+<article class="term-card" id="term-effect" data-search="effect / disposer（副作用与清理） effect / disposer 组合 由 ctx.effect() 管理的注册副作用；返回 disposer，插件卸载时自动回滚。 仓库定义（cordis 插件约定）：注册服务、工具、监听器、ui 槽位等应通过 effect 或注册返回的 disposer 管理。 避免重复注册、泄漏和热更新残留，保证卸载可逆。 effect 绑定到当前 fiber/plugin 生命周期；dispose 时按注册清理；ctx.on/register 通常返回 disposer。 所有需要回滚的注册；不是业务事务，也不保证跨进程/持久化回滚。 vendor/cordis 的 ctx.effect；各插件的 ctx.on/register。 认为手动 removelistener 就足够；异常路径、重复注册和 hmr 容易漏清理。 dispose 插件后确认工具/服务/监听器消失；hmr 安全测试。">
+<div class="term-head"><div class="term-index">13</div><div class="term-title"><h3>Effect / Disposer（副作用与清理） <small>effect / disposer</small></h3><p class="term-oneline">由 ctx.effect() 管理的注册副作用；返回 disposer，插件卸载时自动回滚。</p></div><span class="term-group">组合</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（Cordis 插件约定）：注册服务、工具、监听器、UI 槽位等应通过 effect 或注册返回的 disposer 管理。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>避免重复注册、泄漏和热更新残留，保证卸载可逆。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>effect 绑定到当前 fiber/plugin 生命周期；dispose 时按注册清理；ctx.on/register 通常返回 disposer。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>所有需要回滚的注册；不是业务事务，也不保证跨进程/持久化回滚。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>vendor/cordis 的 ctx.effect；各插件的 ctx.on/register。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>认为手动 removeListener 就足够；异常路径、重复注册和 HMR 容易漏清理。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>dispose 插件后确认工具/服务/监听器消失；HMR 安全测试。</p></div>
+</div></article>
+<article class="term-card" id="term-tool" data-search="tool（工具） tool 能力 模型可调用的动作：name、description、参数 schema、execute、output/presentation。 仓库定义（packages/core/tools/readme.md）：definetool 声明类型化参数、输出契约、执行体和可选 ui 呈现；工具注册到 ctx.tools。 把文件、终端、网络、数据库等实际动作以受控 schema 暴露给模型。 模型产生 tool call → registry 校验/权限/执行 → 结果写 tool/result → 模型看到结果；native 或 ptc 两种呈现。 tool 是模型接口；具体能力由 provider/service 实现；tool 不是 plugin/service。 packages/core/tools；packages/fs/tool-fs；packages/shell/tool-bash；packages/web/tool-web。 把 tool 当成后端函数或插件；工具只是模型可见的动作接口。 注册后 dump-config 看到 schema；调用产生 tool/call 与 tool/result。">
+<div class="term-head"><div class="term-index">14</div><div class="term-title"><h3>Tool（工具） <small>tool</small></h3><p class="term-oneline">模型可调用的动作：name、description、参数 schema、execute、output/presentation。</p></div><span class="term-group">能力</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/core/tools/README.md）：defineTool 声明类型化参数、输出契约、执行体和可选 UI 呈现；工具注册到 ctx.tools。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把文件、终端、网络、数据库等实际动作以受控 schema 暴露给模型。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>模型产生 tool call → registry 校验/权限/执行 → 结果写 tool/result → 模型看到结果；native 或 PTC 两种呈现。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Tool 是模型接口；具体能力由 Provider/Service 实现；Tool 不是 Plugin/Service。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/tools；packages/fs/tool-fs；packages/shell/tool-bash；packages/web/tool-web。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Tool 当成后端函数或插件；工具只是模型可见的动作接口。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>注册后 dump-config 看到 schema；调用产生 tool/call 与 tool/result。</p></div>
+</div></article>
+<article class="term-card" id="term-tool-registry" data-search="tool registry（工具注册表） tool registry 能力 ctx.tools：保存工具定义、可见性、权限与执行，并把 schema 喂给 prompt 组装。 仓库定义（packages/core/tools）：注册即让工具对 agent 可见；registry 负责 schema、校验、策略、执行和结果封装。 集中管理工具生命周期、可见性、权限、并发和呈现，避免 loop 里散落工具逻辑。 register 注册；restrict 按 scope 过滤；pre/post 管线；native/ptc 执行；结果进入 session。 每个 agent scope 可有不同可见性/限制；registry 不是 ui 列表，也不是业务实现。 packages/core/tools/src/index.ts；agent-loop/src/tool-calls.ts。 把 registry 当成静态工具清单；它同时管执行/策略/呈现。 注册、restrict、dispose，检查 prompt schema 与执行结果。">
+<div class="term-head"><div class="term-index">15</div><div class="term-title"><h3>Tool Registry（工具注册表） <small>tool registry</small></h3><p class="term-oneline">ctx.tools：保存工具定义、可见性、权限与执行，并把 schema 喂给 prompt 组装。</p></div><span class="term-group">能力</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/core/tools）：注册即让工具对 Agent 可见；registry 负责 schema、校验、策略、执行和结果封装。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>集中管理工具生命周期、可见性、权限、并发和呈现，避免 loop 里散落工具逻辑。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>register 注册；restrict 按 scope 过滤；pre/post 管线；native/PTC 执行；结果进入 Session。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>每个 Agent scope 可有不同可见性/限制；registry 不是 UI 列表，也不是业务实现。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/tools/src/index.ts；agent-loop/src/tool-calls.ts。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 registry 当成静态工具清单；它同时管执行/策略/呈现。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>注册、restrict、dispose，检查 prompt schema 与执行结果。</p></div>
+</div></article>
+<article class="term-card" id="term-skill" data-search="skill（技能） skill 能力 可加载的指令/脚本知识包，通常通过 skill 工具读取；不是模型可直接执行的动作。 仓库定义（packages/skill）：skill 提供领域流程/知识，由 tool-skill 读取；office 等 skill 还会提供 cli 路径。 把可复用流程和领域知识注入上下文，而不是把每种流程写进 agent-loop。 发现/读取 skill 内容 → 作为工具结果/上下文进入模型 → 模型按流程调用现有 tools/shell。 skill 内容通常模型可见；实际执行仍通过 tools/shell；skill 不是权限边界。 packages/skill/skill-filesystem；skill-office；tool-skill。 把 skill 当成 tool/function；skill 是知识/流程，tool 是动作。 调用 skill 工具，查看返回内容/office cli 路径。">
+<div class="term-head"><div class="term-index">16</div><div class="term-title"><h3>Skill（技能） <small>skill</small></h3><p class="term-oneline">可加载的指令/脚本知识包，通常通过 skill 工具读取；不是模型可直接执行的动作。</p></div><span class="term-group">能力</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/skill）：skill 提供领域流程/知识，由 tool-skill 读取；Office 等 skill 还会提供 CLI 路径。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把可复用流程和领域知识注入上下文，而不是把每种流程写进 agent-loop。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>发现/读取 skill 内容 → 作为工具结果/上下文进入模型 → 模型按流程调用现有 tools/shell。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Skill 内容通常模型可见；实际执行仍通过 tools/shell；skill 不是权限边界。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/skill/skill-filesystem；skill-office；tool-skill。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Skill 当成 Tool/function；skill 是知识/流程，tool 是动作。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>调用 skill 工具，查看返回内容/Office CLI 路径。</p></div>
+</div></article>
+<article class="term-card" id="term-host" data-search="host（宿主进程） host 载体 运行 cordis 插件树、agent、session、工具和 web api 的 node 进程。 仓库定义（docs/architecture.md）：web host 与 desktop host 是不同载体，但都运行同一套 host/插件树。 承载有状态运行时；让 client 只做投影和交互。 app-boot/loader 装配树；webserver 提供 http/ws；agent/session/tools 在进程内运行。 host 不是 electron main，也不是浏览器；一个 host 进程通常服务一个 profile。 packages/bundle/web-app；packages/host/webserver；apps/desktop-host。 把 host 当成 web 服务器或 ui；host 是运行时。 dsh web 启动后看进程、端口和日志；client 只是连接方。">
+<div class="term-head"><div class="term-index">17</div><div class="term-title"><h3>Host（宿主进程） <small>host</small></h3><p class="term-oneline">运行 Cordis 插件树、Agent、Session、工具和 Web API 的 Node 进程。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（docs/architecture.md）：Web Host 与 Desktop Host 是不同载体，但都运行同一套 Host/插件树。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>承载有状态运行时；让 Client 只做投影和交互。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>app-boot/Loader 装配树；webServer 提供 HTTP/WS；Agent/Session/Tools 在进程内运行。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Host 不是 Electron main，也不是浏览器；一个 Host 进程通常服务一个 profile。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/bundle/web-app；packages/host/webserver；apps/desktop-host。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Host 当成 Web 服务器或 UI；Host 是运行时。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>dsh web 启动后看进程、端口和日志；Client 只是连接方。</p></div>
+</div></article>
+<article class="term-card" id="term-client" data-search="client（客户端） client 载体 浏览器/electron 渲染层，通过 http/ws 消费 host 投影；ui 插件位于 packages/client/ui-*。 仓库定义（packages/client）：client 通过 api/ws 发命令、订阅投影、渲染 ui；不直接运行 agent。 把交互与运行时分离，使 web、desktop 复用同一套 host。 client 插件注册槽位/状态；host 广播投影；用户操作转成 api 命令。 client 不读 host 文件系统、不直接跑模型；它不是 agent 的一部分。 packages/client；apps/web；apps/desktop 的 preload/renderer。 把 client 当成 host 的一部分；禁用 client 后 host 仍可 headless/sdk 运行。 停掉浏览器仍可通过 cli/sdk 驱动同一 host。">
+<div class="term-head"><div class="term-index">18</div><div class="term-title"><h3>Client（客户端） <small>client</small></h3><p class="term-oneline">浏览器/Electron 渲染层，通过 HTTP/WS 消费 Host 投影；UI 插件位于 packages/client/ui-*。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/client）：Client 通过 API/WS 发命令、订阅投影、渲染 UI；不直接运行 Agent。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把交互与运行时分离，使 Web、Desktop 复用同一套 Host。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Client 插件注册槽位/状态；Host 广播投影；用户操作转成 API 命令。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Client 不读 Host 文件系统、不直接跑模型；它不是 Agent 的一部分。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/client；apps/web；apps/desktop 的 preload/renderer。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Client 当成 Host 的一部分；禁用 Client 后 Host 仍可 headless/SDK 运行。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>停掉浏览器仍可通过 CLI/SDK 驱动同一 Host。</p></div>
+</div></article>
+<article class="term-card" id="term-desktop-host" data-search="desktop host（桌面宿主） desktop host 载体 桌面版实际运行 host 的 node 子进程；electron main 通过 ipc 启动/管理它。 仓库定义（apps/desktop-host）：electron 以 electron_run_as_node 启动 desktop host，加载 desktop profile，复用 web host 与插件树。 把有状态 host 与 electron 壳隔离，避免把插件树塞进主进程，同时复用 web 运行时。 electron main 创建窗口/协议 → spawn desktop host → host 监听 web/api → ipc boot/ready 把 token/端口交给页面。 desktop host 不是 electron main，也不是独立 agent 实现；它负责 office/更新/退出等桌面能力。 apps/desktop-host/src/index.ts；apps/desktop/src/main.ts；desktop profile patch。 把 electron main 当 host；main 只是壳，host 是 node 子进程。 看进程树：electron main + desktop host；日志出现 dsh web 地址。">
+<div class="term-head"><div class="term-index">19</div><div class="term-title"><h3>Desktop Host（桌面宿主） <small>desktop host</small></h3><p class="term-oneline">桌面版实际运行 Host 的 Node 子进程；Electron main 通过 IPC 启动/管理它。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（apps/desktop-host）：Electron 以 ELECTRON_RUN_AS_NODE 启动 Desktop Host，加载 desktop profile，复用 Web Host 与插件树。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把有状态 Host 与 Electron 壳隔离，避免把插件树塞进主进程，同时复用 Web 运行时。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Electron main 创建窗口/协议 → spawn Desktop Host → Host 监听 Web/API → IPC boot/ready 把 token/端口交给页面。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Desktop Host 不是 Electron main，也不是独立 Agent 实现；它负责 Office/更新/退出等桌面能力。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>apps/desktop-host/src/index.ts；apps/desktop/src/main.ts；desktop profile patch。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Electron main 当 Host；main 只是壳，Host 是 Node 子进程。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>看进程树：Electron main + Desktop Host；日志出现 dsh web 地址。</p></div>
+</div></article>
+<article class="term-card" id="term-primary-runtime" data-search="primary runtime（主运行时） primary runtime 载体 打包进 desktop 的独立 node/python/pnpm/依赖运行时，位于 resources/runtime/primary-runtime。 仓库定义（scripts/primary-runtime）：lock.json 固定 node/python/pnpm 版本与哈希，prepare-runtime 下载、校验并组装。 让用户机器无需预装 node/python/pnpm，并保证构建可复现。 lock 记录版本/url/hash；prepare-runtime 下载/校验；cli/runtime 从打包目录解析解释器。 只包含受控运行时；不等于系统工具链；office/python 依赖也随 runtime 打包。 scripts/primary-runtime/lock.json；apps/desktop/scripts/prepare-runtime.ts；resources/runtime/versions.json。 依赖用户系统的 node/python；桌面版用自己的 primary runtime。 查看 resources/runtime/versions.json；dsh --version 正常。">
+<div class="term-head"><div class="term-index">20</div><div class="term-title"><h3>Primary Runtime（主运行时） <small>primary runtime</small></h3><p class="term-oneline">打包进 Desktop 的独立 Node/Python/pnpm/依赖运行时，位于 resources/runtime/primary-runtime。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（scripts/primary-runtime）：lock.json 固定 Node/Python/pnpm 版本与哈希，prepare-runtime 下载、校验并组装。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让用户机器无需预装 Node/Python/pnpm，并保证构建可复现。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>lock 记录版本/URL/hash；prepare-runtime 下载/校验；CLI/runtime 从打包目录解析解释器。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>只包含受控运行时；不等于系统工具链；Office/Python 依赖也随 runtime 打包。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>scripts/primary-runtime/lock.json；apps/desktop/scripts/prepare-runtime.ts；resources/runtime/versions.json。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>依赖用户系统的 node/python；桌面版用自己的 primary runtime。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>查看 resources/runtime/versions.json；dsh --version 正常。</p></div>
+</div></article>
+<article class="term-card" id="term-sandbox" data-search="sandbox（沙箱） sandbox 安全 对进程/文件访问施加限制的策略与实现；linux 用 bwrap → landlock，按可用性 fail-closed。 仓库定义（packages/sandbox）：dsh-sandbox 是 service definition，sandbox-local 提供本地实现，bash/fs 工具是 consumer。 降低工具执行对用户系统的风险；在能力边界上统一策略。 工具请求经过 sandbox 服务/策略；本地 provider 用命名空间/seccomp/landlock 等约束；拒绝时返回结构化标记。 不是完整 vm 安全边界；平台能力不同；工具/provider 仍需做输入校验。 packages/sandbox/sandbox；sandbox-local；sandbox-policy；fs-sandbox；bash-sandbox。 把 sandbox 当成 vm/容器；dsh 的本地沙箱是进程/文件策略。 触发拒绝，观察 [sandbox: ...] 标记；dump-config 查看 sandbox seam。">
+<div class="term-head"><div class="term-index">21</div><div class="term-title"><h3>Sandbox（沙箱） <small>sandbox</small></h3><p class="term-oneline">对进程/文件访问施加限制的策略与实现；Linux 用 bwrap → Landlock，按可用性 fail-closed。</p></div><span class="term-group">安全</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/sandbox）：dsh-sandbox 是 Service Definition，sandbox-local 提供本地实现，bash/fs 工具是 Consumer。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>降低工具执行对用户系统的风险；在能力边界上统一策略。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>工具请求经过 sandbox 服务/策略；本地 provider 用命名空间/seccomp/Landlock 等约束；拒绝时返回结构化标记。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>不是完整 VM 安全边界；平台能力不同；工具/provider 仍需做输入校验。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/sandbox/sandbox；sandbox-local；sandbox-policy；fs-sandbox；bash-sandbox。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 sandbox 当成 VM/容器；DSH 的本地沙箱是进程/文件策略。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>触发拒绝，观察 [sandbox: ...] 标记；dump-config 查看 sandbox seam。</p></div>
+</div></article>
+<article class="term-card" id="term-projection" data-search="projection（投影） projection 持久化 从 session 事件派生的读模型（列表、标题、统计、ui 状态），不是事实源。 仓库定义（packages/session/session-projection）：projection 从事件日志派生，可重建；日志才是事实。 让查询/渲染高效，避免每次重放全部日志。 监听事件增量更新；从日志重建；缓存/数据库可丢弃。 可重建、可缓存；不能反向作为 session 事实源；ai 可见内容仍以日志为准。 packages/session/session-projection；client store 中的派生状态。 把投影数据库当主库；删掉投影后必须能从日志恢复。 删除/重建 projection，session 日志与模型上下文不受影响。">
+<div class="term-head"><div class="term-index">22</div><div class="term-title"><h3>Projection（投影） <small>projection</small></h3><p class="term-oneline">从 Session 事件派生的读模型（列表、标题、统计、UI 状态），不是事实源。</p></div><span class="term-group">持久化</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/session/session-projection）：projection 从事件日志派生，可重建；日志才是事实。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让查询/渲染高效，避免每次重放全部日志。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>监听事件增量更新；从日志重建；缓存/数据库可丢弃。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>可重建、可缓存；不能反向作为 Session 事实源；AI 可见内容仍以日志为准。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/session/session-projection；client store 中的派生状态。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把投影数据库当主库；删掉投影后必须能从日志恢复。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>删除/重建 projection，Session 日志与模型上下文不受影响。</p></div>
+</div></article>
+<article class="term-card" id="term-compaction" data-search="compaction（上下文压缩） compaction 持久化 压缩上下文以控制 token 预算的插件集合，例如基础压缩、图片卸载、工具结果裁剪。 仓库定义（packages/compaction）：通过插件在模型请求前压缩/裁剪上下文，同时遵守 model-visible ⟺ logged。 让长会话/大工具结果不超出 context window，同时保留可恢复性。 按策略选择/摘要/裁剪消息；压缩结果进入模型请求；原始日志仍保留。 改变模型可见上下文，但不删除 session 日志；压缩策略可组合。 packages/compaction/compaction-basic；compaction-image-offload；compaction-tool-result-pruner。 把 compaction 当成删除日志；日志保留，压缩的是请求上下文。 长会话后检查请求消息变短、日志仍完整。">
+<div class="term-head"><div class="term-index">23</div><div class="term-title"><h3>Compaction（上下文压缩） <small>compaction</small></h3><p class="term-oneline">压缩上下文以控制 token 预算的插件集合，例如基础压缩、图片卸载、工具结果裁剪。</p></div><span class="term-group">持久化</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/compaction）：通过插件在模型请求前压缩/裁剪上下文，同时遵守 model-visible ⟺ logged。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让长会话/大工具结果不超出 context window，同时保留可恢复性。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>按策略选择/摘要/裁剪消息；压缩结果进入模型请求；原始日志仍保留。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>改变模型可见上下文，但不删除 Session 日志；压缩策略可组合。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/compaction/compaction-basic；compaction-image-offload；compaction-tool-result-pruner。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 compaction 当成删除日志；日志保留，压缩的是请求上下文。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>长会话后检查请求消息变短、日志仍完整。</p></div>
+</div></article>
+<article class="term-card" id="term-ptc" data-search="ptc（程序化工具调用） programmatic tool calling 能力 模型写一段程序来调用工具，而不是逐条 function call；dsh 用 run_code + 生成 sdk 呈现。 仓库定义（packages/core/tools/readme.md）：mode=ptc 时模型只看到 run_code 和生成 sdk；子调用仍走 tool registry。 支持复杂多工具编排、并行子调用和更少的模型往返。 模型生成 run_code 程序；运行时提供工具 sdk；子调用 dispatch 回 registry；maxparallelsubcalls 限制并发。 ptc 是工具呈现模式，不是另一个 agent；工具仍受权限/沙箱/结果记录约束。 packages/core/tools/src/ptc.ts；ptc-runtime；agent-loop/src/tool-calls.ts。 把 ptc 当成任意代码执行；它仍然是受控的工具调用。 配置 mode=ptc，跑 run_code，观察 tool/ptc-dispatch。">
+<div class="term-head"><div class="term-index">24</div><div class="term-title"><h3>PTC（程序化工具调用） <small>programmatic tool calling</small></h3><p class="term-oneline">模型写一段程序来调用工具，而不是逐条 function call；DSH 用 run_code + 生成 SDK 呈现。</p></div><span class="term-group">能力</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/core/tools/README.md）：mode=ptc 时模型只看到 run_code 和生成 SDK；子调用仍走 tool registry。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>支持复杂多工具编排、并行子调用和更少的模型往返。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>模型生成 run_code 程序；运行时提供工具 SDK；子调用 dispatch 回 registry；maxParallelSubCalls 限制并发。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>PTC 是工具呈现模式，不是另一个 Agent；工具仍受权限/沙箱/结果记录约束。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/tools/src/ptc.ts；ptc-runtime；agent-loop/src/tool-calls.ts。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 PTC 当成任意代码执行；它仍然是受控的工具调用。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>配置 mode=ptc，跑 run_code，观察 tool/ptc-dispatch。</p></div>
+</div></article>
+<article class="term-card" id="term-mcp" data-search="mcp（模型上下文协议） model context protocol 能力 连接外部工具/资源服务器的协议；dsh 通过 mcp-client 把外部能力适配进 ctx.tools。 仓库定义（packages/mcp）：mcp client 发现并调用外部 server 的 tools/resources；通过适配层进入 dsh 工具树。 复用 mcp 生态工具，而不必为每个工具写一个内置插件。 配置 server/transport；client 发现 tools/resources；适配为工具定义；调用结果转成 dsh 结果。 外部进程/服务器；需要信任、权限、超时和错误处理；不是内置插件。 packages/mcp/mcp-client；mcp-resources；profile 中的 mcp 配置。 把 mcp 当成一个工具；mcp 是协议/服务器接入层。 配置一个 mcp server，列出工具并调用，查看 tool/result。">
+<div class="term-head"><div class="term-index">25</div><div class="term-title"><h3>MCP（模型上下文协议） <small>Model Context Protocol</small></h3><p class="term-oneline">连接外部工具/资源服务器的协议；DSH 通过 mcp-client 把外部能力适配进 ctx.tools。</p></div><span class="term-group">能力</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/mcp）：MCP client 发现并调用外部 server 的 tools/resources；通过适配层进入 DSH 工具树。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>复用 MCP 生态工具，而不必为每个工具写一个内置插件。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>配置 server/transport；client 发现 tools/resources；适配为工具定义；调用结果转成 DSH 结果。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>外部进程/服务器；需要信任、权限、超时和错误处理；不是内置插件。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/mcp/mcp-client；mcp-resources；profile 中的 MCP 配置。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 MCP 当成一个工具；MCP 是协议/服务器接入层。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>配置一个 MCP server，列出工具并调用，查看 tool/result。</p></div>
+</div></article>
+<article class="term-card" id="term-subagent" data-search="subagent（子智能体） subagent 执行 由主 agent 派生、拥有独立 session 的子 agent；通过 subagent 工具调用并返回结果。 仓库定义（packages/subagent）：子 agent 有独立 session/生命周期，lineage 记录父子关系；scope 不自动继承。 隔离上下文、并行调研、把专项任务交给独立 agent。 父 agent 发起 subagent 工具调用；运行时创建子 session/agent；子 agent 完成后结果回到父工具结果。 子 agent 不是同一 turn 的 step；工具/权限/模型可不同；日志独立。 packages/subagent/subagent；tool-subagent；subagent-fork-in-process。 把 subagent 当成一次工具调用；它是独立 agent/session。 父工具调用 → 子 session 出现 → 父收到结果。">
+<div class="term-head"><div class="term-index">26</div><div class="term-title"><h3>Subagent（子智能体） <small>subagent</small></h3><p class="term-oneline">由主 Agent 派生、拥有独立 Session 的子 Agent；通过 subagent 工具调用并返回结果。</p></div><span class="term-group">执行</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/subagent）：子 Agent 有独立 Session/生命周期，lineage 记录父子关系；scope 不自动继承。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>隔离上下文、并行调研、把专项任务交给独立 Agent。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>父 Agent 发起 subagent 工具调用；运行时创建子 Session/Agent；子 Agent 完成后结果回到父工具结果。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>子 Agent 不是同一 turn 的 step；工具/权限/模型可不同；日志独立。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/subagent/subagent；tool-subagent；subagent-fork-in-process。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 subagent 当成一次工具调用；它是独立 Agent/Session。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>父工具调用 → 子 Session 出现 → 父收到结果。</p></div>
+</div></article>
+<article class="term-card" id="term-agent" data-search="agent（智能体） agent 执行 一个可创建、恢复、取消的 live agent；有独立 session 和控制面。 仓库定义（packages/core/agent）：ctx.agents.create()/resume() 返回 agenthandle；通过 followup/steer/inject/cancel/whenidle 驱动。 给插件、ui 和编排器一个稳定的控制面，而不是直接操作 loop 内部状态。 create/resume 构建 agent 与 session；消息进入 inbox；driver（agent-loop）推进；dispose 停止循环并回滚 scope。 agent 绑定 session，但 session 不是 agent；子 agent 有独立 session；agent 的 scope 可注册专属工具/提示/监听器。 packages/core/agent；packages/core/agent-loop；ctx.agents。 把 agent 当成模型调用或 session；agent 是控制面+运行时对象。 创建 agent → followup → whenidle；查看 agent/created、turn/start、agent/disposed。">
+<div class="term-head"><div class="term-index">27</div><div class="term-title"><h3>Agent（智能体） <small>agent</small></h3><p class="term-oneline">一个可创建、恢复、取消的 live agent；有独立 Session 和控制面。</p></div><span class="term-group">执行</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/core/agent）：ctx.agents.create()/resume() 返回 AgentHandle；通过 followup/steer/inject/cancel/whenIdle 驱动。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>给插件、UI 和编排器一个稳定的控制面，而不是直接操作 loop 内部状态。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>create/resume 构建 Agent 与 Session；消息进入 inbox；driver（agent-loop）推进；dispose 停止循环并回滚 scope。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Agent 绑定 Session，但 Session 不是 Agent；子 Agent 有独立 Session；Agent 的 scope 可注册专属工具/提示/监听器。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/agent；packages/core/agent-loop；ctx.agents。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Agent 当成模型调用或 Session；Agent 是控制面+运行时对象。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>创建 Agent → followup → whenIdle；查看 agent/created、turn/start、agent/disposed。</p></div>
+</div></article>
+<article class="term-card" id="term-inbox" data-search="inbox（输入队列） inbox 执行 agent 待处理输入的队列，区分 followup、steer、inject 的语义。 仓库定义（agent-loop/src/inbox.ts）：followup 排队下一轮，steer 提交下一步输入，inject 注入模型可见上下文但不唤醒。 让人/插件在 turn 运行中安全地补充、纠偏或注入上下文。 输入带 target 与唤醒标志；loop 在 step 边界 claim；inject 进入下一次 admitted step。 只影响目标 agent/session；不是持久化消息本身；取消时可清空/保留。 agent-loop/src/inbox.ts；agenthandle.followup/steer/inject。 把 inject 当成 followup；inject 不唤醒 driver。 运行中 steer/inject，观察 step 边界与 agent/inbox 事件。">
+<div class="term-head"><div class="term-index">28</div><div class="term-title"><h3>Inbox（输入队列） <small>inbox</small></h3><p class="term-oneline">Agent 待处理输入的队列，区分 followup、steer、inject 的语义。</p></div><span class="term-group">执行</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（agent-loop/src/inbox.ts）：followup 排队下一轮，steer 提交下一步输入，inject 注入模型可见上下文但不唤醒。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让人/插件在 turn 运行中安全地补充、纠偏或注入上下文。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>输入带 target 与唤醒标志；loop 在 step 边界 claim；inject 进入下一次 admitted step。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>只影响目标 Agent/Session；不是持久化消息本身；取消时可清空/保留。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>agent-loop/src/inbox.ts；AgentHandle.followup/steer/inject。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 inject 当成 followup；inject 不唤醒 driver。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>运行中 steer/inject，观察 step 边界与 agent/inbox 事件。</p></div>
+</div></article>
+<article class="term-card" id="term-workspace" data-search="workspace（工作区） workspace 运行时 用户项目目录/当前工作目录，以及文件工具访问的作用范围。 仓库定义（packages/workspace、working-directory）：workspace 表示项目/目录上下文；session 的 cwd 会随工具改变，但 sandbox 权限根不变。 让模型和工具知道在哪里读写，同时与 session 生命周期解耦。 workingdirectory 服务维护 cwd；fs/bash 工具相对路径解析；sandbox 使用权限根。 workspace 不是 session 日志，也不是 ui 工作区；切换 cwd 不等于扩大 sandbox。 packages/workspace；packages/session/working-directory；fs/sandbox。 把 workspace 当成 session 或 git 仓库；它是目录/项目上下文。 切换 cwd 后读文件，观察相对路径与 sandbox root。">
+<div class="term-head"><div class="term-index">29</div><div class="term-title"><h3>Workspace（工作区） <small>workspace</small></h3><p class="term-oneline">用户项目目录/当前工作目录，以及文件工具访问的作用范围。</p></div><span class="term-group">运行时</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/workspace、working-directory）：workspace 表示项目/目录上下文；Session 的 cwd 会随工具改变，但 sandbox 权限根不变。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让模型和工具知道在哪里读写，同时与 Session 生命周期解耦。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>workingDirectory 服务维护 cwd；fs/bash 工具相对路径解析；sandbox 使用权限根。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Workspace 不是 Session 日志，也不是 UI 工作区；切换 cwd 不等于扩大 sandbox。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/workspace；packages/session/working-directory；fs/sandbox。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 workspace 当成 Session 或 Git 仓库；它是目录/项目上下文。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>切换 cwd 后读文件，观察相对路径与 sandbox root。</p></div>
+</div></article>
+<article class="term-card" id="term-model-provider" data-search="model provider / adapter（模型适配器） model provider / adapter 模型 把 dsh 的统一 llm 请求映射到具体供应商 api 的适配器，负责流式、工具调用和错误语义。 仓库定义（packages/llm）：llm 定义消息/流/工具调用接缝；llm-deepseek 等 provider 实现具体 api。 让 agent/session 不依赖某个供应商，支持多模型路由。 preparecall/请求头选择 provider+model；adapter 发请求、转流事件；错误/重试由 llm-retry 等插件处理。 provider 不拥有 session；请求头记录实际 provider/model/reasoning；能力差异由 adapter 声明。 packages/llm/llm；llm-deepseek；llm-deepseek-api-key；llm-retry。 把 provider 当成 agent/模型本身；它只是 api 适配层。 切换 provider 配置，检查 request/header 与流事件。">
+<div class="term-head"><div class="term-index">30</div><div class="term-title"><h3>Model Provider / Adapter（模型适配器） <small>model provider / adapter</small></h3><p class="term-oneline">把 DSH 的统一 LLM 请求映射到具体供应商 API 的适配器，负责流式、工具调用和错误语义。</p></div><span class="term-group">模型</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/llm）：llm 定义消息/流/工具调用接缝；llm-deepseek 等 provider 实现具体 API。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让 Agent/Session 不依赖某个供应商，支持多模型路由。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>prepareCall/请求头选择 provider+model；adapter 发请求、转流事件；错误/重试由 llm-retry 等插件处理。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Provider 不拥有 Session；请求头记录实际 provider/model/reasoning；能力差异由 adapter 声明。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/llm/llm；llm-deepseek；llm-deepseek-api-key；llm-retry。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 provider 当成 Agent/模型本身；它只是 API 适配层。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>切换 provider 配置，检查 request/header 与流事件。</p></div>
+</div></article>
+<article class="term-card" id="term-web-host" data-search="web host（web 宿主） web host 载体 在 host 进程内提供 http/ws、api gateway 和静态前端的 web 载体。 仓库定义（bundle/web-app + host/webserver）：web host 绑定 webserver，暴露 /api 与 websocket，服务浏览器前端。 让浏览器/桌面页面连接同一套 host 状态。 webserver 提供 http/ws；api gateway 暴露 controller；前端静态资源由 host 提供；cookie/loopback 校验。 web host 是 host 的一部分，不是 client；端口/认证只影响接入。 packages/bundle/web-app；packages/host/webserver；packages/api/gateway。 把 web host 当成浏览器页面；页面是 client。 dsh web 启动，浏览器/curl 访问 /api。">
+<div class="term-head"><div class="term-index">31</div><div class="term-title"><h3>Web Host（Web 宿主） <small>web host</small></h3><p class="term-oneline">在 Host 进程内提供 HTTP/WS、API gateway 和静态前端的 Web 载体。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（bundle/web-app + host/webserver）：Web Host 绑定 webServer，暴露 /api 与 WebSocket，服务浏览器前端。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让浏览器/桌面页面连接同一套 Host 状态。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>webServer 提供 HTTP/WS；API gateway 暴露 controller；前端静态资源由 host 提供；cookie/loopback 校验。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Web Host 是 Host 的一部分，不是 Client；端口/认证只影响接入。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/bundle/web-app；packages/host/webserver；packages/api/gateway。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 Web Host 当成浏览器页面；页面是 Client。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>dsh web 启动，浏览器/curl 访问 /api。</p></div>
+</div></article>
+<article class="term-card" id="term-headless" data-search="headless（无头模式） headless 载体 不启动 ui 的一次性 cli 运行 profile，复用 base 能力执行任务。 仓库定义（packages/bundle/headless）：headless profile 用于 cli 一次性运行，不加载浏览器/桌面壳。 在服务器/脚本里跑 agent，不需要 electron 或浏览器。 选择 headless bundle；base 服务 + agent-loop 运行；命令结束/退出。 headless 不是另一个 agent；只是不同 profile/载体。 packages/bundle/headless；apps/cli 的 --profile headless。 把 headless 当成无模型模式；它仍然调用模型/工具。 dsh --profile headless &quot;task&quot;（需要 api key）。">
+<div class="term-head"><div class="term-index">32</div><div class="term-title"><h3>Headless（无头模式） <small>headless</small></h3><p class="term-oneline">不启动 UI 的一次性 CLI 运行 profile，复用 base 能力执行任务。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/bundle/headless）：headless profile 用于 CLI 一次性运行，不加载浏览器/桌面壳。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>在服务器/脚本里跑 Agent，不需要 Electron 或浏览器。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>选择 headless bundle；base 服务 + agent-loop 运行；命令结束/退出。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Headless 不是另一个 Agent；只是不同 profile/载体。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/bundle/headless；apps/cli 的 --profile headless。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 headless 当成无模型模式；它仍然调用模型/工具。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>dsh --profile headless &quot;task&quot;（需要 API Key）。</p></div>
+</div></article>
+<article class="term-card" id="term-acp" data-search="acp（agent client protocol） acp 载体 通过 stdio 接入的自动化协议载体，让外部客户端驱动 dsh。 仓库定义（packages/bundle/acp-app）：acp 是自动化接入载体，使用 base 能力，不启动 web/desktop ui。 给编辑器和自动化工具一个标准输入输出接口。 acp 进程通过 stdio 收发协议消息；映射到 agent/session 操作。 acp 是载体/协议，不是 tool；权限/能力仍由 profile 决定。 packages/bundle/acp-app；packages/acp。 把 acp 当成 mcp；两者协议/用途不同。 用 acp 客户端启动并发送一轮请求。">
+<div class="term-head"><div class="term-index">33</div><div class="term-title"><h3>ACP（Agent Client Protocol） <small>ACP</small></h3><p class="term-oneline">通过 stdio 接入的自动化协议载体，让外部客户端驱动 DSH。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/bundle/acp-app）：ACP 是自动化接入载体，使用 base 能力，不启动 Web/Desktop UI。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>给编辑器和自动化工具一个标准输入输出接口。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>ACP 进程通过 stdio 收发协议消息；映射到 Agent/Session 操作。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>ACP 是载体/协议，不是 Tool；权限/能力仍由 profile 决定。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/bundle/acp-app；packages/acp。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 ACP 当成 MCP；两者协议/用途不同。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>用 ACP 客户端启动并发送一轮请求。</p></div>
+</div></article>
+<article class="term-card" id="term-sdk" data-search="sdk（远程客户端） sdk 载体 typescript/python 远程调用 host 的客户端与协议栈，投影 agent loop。 仓库定义（packages/sdk、python/sdk-runtime）：sdk 通过 json-rpc 连接 host，提供会话/agent 操作。 让外部程序嵌入 dsh，而不是自己实现一轮 loop。 sdk server 暴露 json-rpc；client 生成调用；事件流投影会话。 sdk 是客户端，不是 agent 本身；需要 host 运行。 packages/sdk/protocol、client、server；python/sdk-runtime。 把 sdk 当成 host/模型；它是远程控制面。 启动 sdk server，客户端创建会话并收到事件。">
+<div class="term-head"><div class="term-index">34</div><div class="term-title"><h3>SDK（远程客户端） <small>SDK</small></h3><p class="term-oneline">TypeScript/Python 远程调用 Host 的客户端与协议栈，投影 Agent Loop。</p></div><span class="term-group">载体</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/sdk、python/sdk-runtime）：SDK 通过 JSON-RPC 连接 Host，提供会话/Agent 操作。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让外部程序嵌入 DSH，而不是自己实现一轮 loop。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>SDK server 暴露 JSON-RPC；client 生成调用；事件流投影会话。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>SDK 是客户端，不是 Agent 本身；需要 Host 运行。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/sdk/protocol、client、server；python/sdk-runtime。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 SDK 当成 Host/模型；它是远程控制面。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>启动 SDK server，客户端创建会话并收到事件。</p></div>
+</div></article>
+<article class="term-card" id="term-goal" data-search="goal（目标） goal 编排 附加在已有 session 上的持久化完成目标，带 phase、revision 和 round 上限。 dsh glossary（docs/glossary.md#goal）：goal 是一个 durable completion objective；phase 为 active/paused/blocked/complete，有 goal-round cap。 让 agent 在多个 turn/round 中持续推进一个明确目标，并可暂停/阻塞/恢复。 goal 状态写入 session；goal round 物化为一个 goal 来源 turn；激活是 process-local，恢复需 human-authorized resume。 goal 是状态，不是 scheduler/独立会话；同一 session 的普通人类 turn 不消耗 goal round。 packages/goal；command-goal；tool-goal；goal-round-driver。 把 goal 当成 todo 或定时任务；goal 有 phase/round cap/重启语义。 创建 goal，运行 round，查看 phase/round 事件。">
+<div class="term-head"><div class="term-index">35</div><div class="term-title"><h3>Goal（目标） <small>goal</small></h3><p class="term-oneline">附加在已有 Session 上的持久化完成目标，带 phase、revision 和 round 上限。</p></div><span class="term-group">编排</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>DSH glossary（docs/glossary.md#goal）：goal 是一个 durable completion objective；phase 为 active/paused/blocked/complete，有 goal-round cap。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让 Agent 在多个 turn/round 中持续推进一个明确目标，并可暂停/阻塞/恢复。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Goal 状态写入 Session；goal round 物化为一个 goal 来源 turn；激活是 process-local，恢复需 human-authorized resume。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Goal 是状态，不是 scheduler/独立会话；同一 Session 的普通人类 turn 不消耗 goal round。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/goal；command-goal；tool-goal；goal-round-driver。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 goal 当成 todo 或定时任务；goal 有 phase/round cap/重启语义。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>创建 goal，运行 round，查看 phase/round 事件。</p></div>
+</div></article>
+<article class="term-card" id="term-todo-schedule" data-search="todo / schedule（待办与定时） todo / schedule 编排 todo 是模型可见的清单工具；schedule 是定时触发的后续任务；两者都不是 goal。 仓库定义（packages/todo、packages/schedule）：todo_write 管理清单；schedule 管理定时提醒/后续输入。 todo 跟踪任务步骤；schedule 在指定时间唤醒/提交任务。 todo 返回清单状态；schedule 注册计时器/后续输入，触发后进入 session。 todo 不保证执行；schedule 不是持久目标；goal 才有 phase/round cap。 packages/todo/tool-todo；packages/schedule/schedule；tool-schedule。 用 todo 代替 goal，或把 schedule 当成 cron 管理器；语义/持久化不同。 创建 todo/schedule，观察工具结果和触发事件。">
+<div class="term-head"><div class="term-index">36</div><div class="term-title"><h3>Todo / Schedule（待办与定时） <small>todo / schedule</small></h3><p class="term-oneline">Todo 是模型可见的清单工具；Schedule 是定时触发的后续任务；两者都不是 Goal。</p></div><span class="term-group">编排</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/todo、packages/schedule）：todo_write 管理清单；schedule 管理定时提醒/后续输入。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>Todo 跟踪任务步骤；Schedule 在指定时间唤醒/提交任务。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Todo 返回清单状态；Schedule 注册计时器/后续输入，触发后进入 Session。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Todo 不保证执行；Schedule 不是持久目标；Goal 才有 phase/round cap。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/todo/tool-todo；packages/schedule/schedule；tool-schedule。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>用 todo 代替 goal，或把 schedule 当成 cron 管理器；语义/持久化不同。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>创建 todo/schedule，观察工具结果和触发事件。</p></div>
+</div></article>
+<article class="term-card" id="term-workflow" data-search="workflow（工作流） workflow 编排 由多个步骤/工具节点组成的编排能力，用于可重复的复杂流程。 仓库定义（packages/workflow）：workflow 提供多节点编排与运行记录；tool-workflow 暴露给模型。 把多步流程从单次 prompt 中抽出来，便于复用和审计。 定义节点/依赖/输入输出；运行器按图执行；结果回到 session。 workflow 不是 agent/ptc；它编排步骤，步骤内部仍调用 tools/agents。 packages/workflow/workflow；workflow-ptc；tool-workflow。 把 workflow 当成普通工具调用；它是多节点编排层。 运行一个 workflow，查看节点状态与结果。">
+<div class="term-head"><div class="term-index">37</div><div class="term-title"><h3>Workflow（工作流） <small>workflow</small></h3><p class="term-oneline">由多个步骤/工具节点组成的编排能力，用于可重复的复杂流程。</p></div><span class="term-group">编排</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/workflow）：workflow 提供多节点编排与运行记录；tool-workflow 暴露给模型。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>把多步流程从单次 prompt 中抽出来，便于复用和审计。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>定义节点/依赖/输入输出；运行器按图执行；结果回到 Session。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Workflow 不是 Agent/PTC；它编排步骤，步骤内部仍调用 tools/agents。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/workflow/workflow；workflow-ptc；tool-workflow。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 workflow 当成普通工具调用；它是多节点编排层。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>运行一个 workflow，查看节点状态与结果。</p></div>
+</div></article>
+<article class="term-card" id="term-session-format" data-search="session format version（会话格式版本） session format version 持久化 session 日志的兼容代际；只在新 reader 无法安全解释旧记录时递增。 仓库定义（packages/core/session/src/types.ts）：单一单调整数；header 记录版本；reader 保留历史语义。 让持久化日志跨版本可读/可迁移，避免静默误读。 事件带 discriminator；版本升级链；旧 reader 拒绝不安全的新字段；快照/迁移测试。 结构变化本身不足以升版本；只有现有 discriminator 无法防止不安全解释时才 bump。 packages/core/session/src/types.ts；packages/session/session-format*。 把所有 schema 变化都当成升版本；错误的版本策略会破坏兼容。 读旧日志/迁移 fixture，确认 reader 行为与版本规则。">
+<div class="term-head"><div class="term-index">38</div><div class="term-title"><h3>Session Format Version（会话格式版本） <small>session format version</small></h3><p class="term-oneline">Session 日志的兼容代际；只在新 reader 无法安全解释旧记录时递增。</p></div><span class="term-group">持久化</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/core/session/src/types.ts）：单一单调整数；header 记录版本；reader 保留历史语义。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让持久化日志跨版本可读/可迁移，避免静默误读。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>事件带 discriminator；版本升级链；旧 reader 拒绝不安全的新字段；快照/迁移测试。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>结构变化本身不足以升版本；只有现有 discriminator 无法防止不安全解释时才 bump。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/session/src/types.ts；packages/session/session-format*。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把所有 schema 变化都当成升版本；错误的版本策略会破坏兼容。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>读旧日志/迁移 fixture，确认 reader 行为与版本规则。</p></div>
+</div></article>
+<article class="term-card" id="term-persistence" data-search="persistence（持久化） persistence 持久化 把 session 事件写入 jsonl/sqlite 等存储的实现；与投影读模型分开。 仓库定义（packages/session/session-persistence-jsonl 等）：persistence 负责事件落盘/读取；query/projection 负责检索/读模型。 让会话可恢复、可审计、可跨进程继续。 append 事件；按 seq 读取；校验日志完整性；sqlite 用于查询索引。 persistence 不等于 projection；日志是事实源，sqlite 索引可重建。 packages/session/session-persistence*；session-query-sqlite。 把 sqlite 查询库当事实源；jsonl 日志才是。 重启后恢复 session；删除查询索引再重建。">
+<div class="term-head"><div class="term-index">39</div><div class="term-title"><h3>Persistence（持久化） <small>persistence</small></h3><p class="term-oneline">把 Session 事件写入 JSONL/SQLite 等存储的实现；与投影读模型分开。</p></div><span class="term-group">持久化</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/session/session-persistence-jsonl 等）：persistence 负责事件落盘/读取；query/projection 负责检索/读模型。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让会话可恢复、可审计、可跨进程继续。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>append 事件；按 seq 读取；校验日志完整性；SQLite 用于查询索引。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>Persistence 不等于 projection；日志是事实源，SQLite 索引可重建。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/session/session-persistence*；session-query-sqlite。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 SQLite 查询库当事实源；JSONL 日志才是。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>重启后恢复 Session；删除查询索引再重建。</p></div>
+</div></article>
+<article class="term-card" id="term-testing-terms" data-search="snapshot / fixture / smoke（测试三词） snapshot / fixture / smoke 验证 snapshot 是回放期望输出；fixture 是固定输入；smoke 是打包后真实进程的最小验收。 仓库定义（packages/test-support、apps/desktop/scripts）：snapshot 用于 keyless 回放；fixture 提供稳定输入；smoke 验证打包运行时。 分别保证行为不漂移、输入可复现、发布包真的能跑。 录制模型/工具输出 → 回放比较；fixture 固定数据；smoke 启动真实 electron/cli 并调用 api/office。 三者不能互相替代；单元测试通过不代表 smoke 通过。 packages/test-support/session-snapshot；tests/fixtures；apps/desktop/scripts/smoke-*.ts。 用单元测试代替 snapshot/smoke；覆盖的失败模式不同。 跑对应测试命令，观察回放/真实进程结果。">
+<div class="term-head"><div class="term-index">40</div><div class="term-title"><h3>Snapshot / Fixture / Smoke（测试三词） <small>snapshot / fixture / smoke</small></h3><p class="term-oneline">Snapshot 是回放期望输出；Fixture 是固定输入；Smoke 是打包后真实进程的最小验收。</p></div><span class="term-group">验证</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>仓库定义（packages/test-support、apps/desktop/scripts）：snapshot 用于 keyless 回放；fixture 提供稳定输入；smoke 验证打包运行时。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>分别保证行为不漂移、输入可复现、发布包真的能跑。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>录制模型/工具输出 → 回放比较；fixture 固定数据；smoke 启动真实 Electron/CLI 并调用 API/Office。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>三者不能互相替代；单元测试通过不代表 smoke 通过。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/test-support/session-snapshot；tests/fixtures；apps/desktop/scripts/smoke-*.ts。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>用单元测试代替 snapshot/smoke；覆盖的失败模式不同。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>跑对应测试命令，观察回放/真实进程结果。</p></div>
+</div></article>
+<article class="term-card" id="term-human-command" data-search="human command（人类命令） human command 交互 以 / 开头的指令，由人类适配器通过 ctx.commands 执行，不进入模型消息。 dsh glossary（docs/glossary.md#human-command）：human command 由 human-facing adapter 解释执行；区别于 model tool 与 shell。 提供确定性的 ui/控制操作，不消耗模型上下文。 命令插件注册；ui 解析/分发；命令处理器直接操作领域状态或返回 ui 结果。 命令输出通常是 ui 状态；只有处理器另行写入持久域才产生事实。 packages/interaction/commands；command-* 插件；ui 命令面板。 把 slash command 当成模型 tool；它不进入模型消息。 执行 /goal 等命令，观察不产生模型请求。">
+<div class="term-head"><div class="term-index">41</div><div class="term-title"><h3>Human Command（人类命令） <small>human command</small></h3><p class="term-oneline">以 / 开头的指令，由人类适配器通过 ctx.commands 执行，不进入模型消息。</p></div><span class="term-group">交互</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>DSH glossary（docs/glossary.md#human-command）：human command 由 human-facing adapter 解释执行；区别于 model tool 与 shell。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>提供确定性的 UI/控制操作，不消耗模型上下文。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>命令插件注册；UI 解析/分发；命令处理器直接操作领域状态或返回 UI 结果。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>命令输出通常是 UI 状态；只有处理器另行写入持久域才产生事实。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/interaction/commands；command-* 插件；UI 命令面板。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 slash command 当成模型 tool；它不进入模型消息。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>执行 /goal 等命令，观察不产生模型请求。</p></div>
+</div></article>
+<article class="term-card" id="term-round-exchange" data-search="round / exchange（轮次/交换） round / exchange 执行 round 是外层策略迭代（如 goal round）；exchange 是连续人类输入 turn 的聊天折叠单位。 dsh glossary（docs/glossary.md#loop-hierarchy）：round 是包含 turn 的外层策略迭代；exchange 是连续 turns 的聊天分组。 区分调度策略的生命周期与 ui 对话分组，避免把所有 turn 都叫 round。 round 计数器属于策略；exchange 由首个含人类输入的 turn 决定，直到下一个。 不要用 round 表示每个 turn/step；exchange 只用于投影/折叠。 goal/ ralph 策略；client 会话列表/折叠。 把 turn、round、exchange 混用；层级和归属不同。 看 goal round 与普通 turn 的计数/归属。">
+<div class="term-head"><div class="term-index">42</div><div class="term-title"><h3>Round / Exchange（轮次/交换） <small>round / exchange</small></h3><p class="term-oneline">Round 是外层策略迭代（如 goal round）；Exchange 是连续人类输入 turn 的聊天折叠单位。</p></div><span class="term-group">执行</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>DSH glossary（docs/glossary.md#loop-hierarchy）：round 是包含 turn 的外层策略迭代；exchange 是连续 turns 的聊天分组。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>区分调度策略的生命周期与 UI 对话分组，避免把所有 turn 都叫 round。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>Round 计数器属于策略；exchange 由首个含人类输入的 turn 决定，直到下一个。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>不要用 round 表示每个 turn/step；exchange 只用于投影/折叠。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>Goal/ Ralph 策略；client 会话列表/折叠。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>把 turn、round、exchange 混用；层级和归属不同。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>看 goal round 与普通 turn 的计数/归属。</p></div>
+</div></article>
+<article class="term-card" id="term-agent-scope" data-search="agent scope（智能体作用域） agent scope 组合 按 agent 隔离注册的作用域；注册要么全局，要么属于一个 scope key，且不向子 agent 继承。 dsh glossary（docs/glossary.md#agent-scope）：scope 是 per-agent registration 的单位；两级、扁平；scoped 注册不会继承给子 agent。 让不同 agent 拥有不同工具/提示/监听器，而不污染全局。 scope key 通常是 live agent 对象；agent.ctx 注册 scope-visible+scope-lifetime；dispatch 带 scope carrier。 subagent 不自动继承 scope；lineage 只是数据，不改变可见性。 packages/core/scope；agent.ctx；agent-preset。 以为子 agent 自动继承父 agent 的工具；实际需要显式装配。 给父 agent 注册 scoped tool，创建子 agent，确认子 agent 不可见。">
+<div class="term-head"><div class="term-index">43</div><div class="term-title"><h3>Agent Scope（智能体作用域） <small>agent scope</small></h3><p class="term-oneline">按 Agent 隔离注册的作用域；注册要么全局，要么属于一个 scope key，且不向子 Agent 继承。</p></div><span class="term-group">组合</span></div>
+<div class="term-fields">
+<div class="term-field"><span class="term-label">官方 / 仓库定义</span><p>DSH glossary（docs/glossary.md#agent-scope）：scope 是 per-agent registration 的单位；两级、扁平；scoped 注册不会继承给子 Agent。</p></div>
+<div class="term-field"><span class="term-label">用途</span><p>让不同 Agent 拥有不同工具/提示/监听器，而不污染全局。</p></div>
+<div class="term-field"><span class="term-label">原理</span><p>scope key 通常是 live agent 对象；agent.ctx 注册 scope-visible+scope-lifetime；dispatch 带 scope carrier。</p></div>
+<div class="term-field"><span class="term-label">作用范围</span><p>subagent 不自动继承 scope；lineage 只是数据，不改变可见性。</p></div>
+<div class="term-field term-where"><span class="term-label">在 DSH 里</span><p>packages/core/scope；agent.ctx；agent-preset。</p></div>
+<div class="term-field term-warn"><span class="term-label">常见混淆</span><p>以为子 Agent 自动继承父 Agent 的工具；实际需要显式装配。</p></div>
+<div class="term-field"><span class="term-label">最小验证</span><p>给父 Agent 注册 scoped tool，创建子 Agent，确认子 Agent 不可见。</p></div>
+</div></article>
+</div>
+<p class="term-empty" id="term-empty" hidden>没有匹配的术语，换个关键词试试。</p>
+
+
 <h2>7. 闭卷自测</h2>
 <ol>
 <li>用一句话区分 Turn 和 Step。</li>
@@ -681,9 +1215,7 @@ details.answer-box[open] { padding-bottom: 16px; }
 <li>“Plugin 就是 Tool，注册工具就是加载插件。”</li>
 <li>“Bundle 是用户目录下的运行配置，Profile 是 npm 包。”</li>
 <li>“Session projection 是事实源，日志只是缓存。”</li>
-<li>“Desktop 版有一套独立的 Agent Loop，和 Web 版不共享。”</li>
-</ol>
-<p>答案在 <a href="#answers">answer-key.zh.md</a> 的模块 1 部分。先写自己的答案，再对照。</p></div></section><section class="section" id="m2" data-section="m2"><div class="chapter"><div class="chapter-left"><div class="chapter-num">02</div><div><h2>项目架构</h2><p>从 CLI / Desktop 入口画到插件树、Host、Session 与工具执行</p></div></div><button class="btn done-btn" type="button" data-done="m2">标记完成</button></div><div class="content">
+</ol></div></section><section class="section" id="m2" data-section="m2"><div class="chapter"><div class="chapter-left"><div class="chapter-num">02</div><div><h2>项目架构</h2><p>从 CLI / Desktop 入口画到插件树、Host、Session 与工具执行</p></div></div><button class="btn done-btn" type="button" data-done="m2">标记完成</button></div><div class="content">
 <p>目标：能在白板上画出“从命令/窗口到模型请求和工具执行”的完整路径，并判断一个新需求应该落在哪个扩展点。</p>
 <h2>1. 五个心智模型</h2>
 <p>先记住这五句话，后面所有细节都挂在它们下面：</p>
@@ -1491,16 +2023,36 @@ pnpm dsh --profile web --dump-config | grep repo-stats
     pre.appendChild(button);
   });
 
-  var sections = Array.prototype.slice.call(document.querySelectorAll('section[data-section]'));
-  if ('IntersectionObserver' in window) {
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) { return; }
-        document.querySelectorAll('.nav a').forEach(function (a) { a.classList.toggle('active', a.dataset.nav === entry.target.id); });
+  var termSearch = document.getElementById('term-search');
+  if (termSearch) {
+    var termCards = Array.prototype.slice.call(document.querySelectorAll('.term-card'));
+    var termCount = document.getElementById('term-count');
+    var termEmpty = document.getElementById('term-empty');
+    var filterTerms = function () {
+      var query = termSearch.value.trim().toLowerCase();
+      var shown = 0;
+      termCards.forEach(function (card) {
+        var match = !query || card.dataset.search.indexOf(query) >= 0;
+        card.hidden = !match;
+        if (match) { shown += 1; }
       });
-    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0.01 });
-    sections.forEach(function (section) { observer.observe(section); });
+      termCount.textContent = shown + ' / ' + termCards.length + ' 个术语';
+      termEmpty.hidden = shown !== 0;
+    };
+    termSearch.addEventListener('input', filterTerms);
+    filterTerms();
   }
+
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section[data-section]'));
+  function updateNav() {
+    var current = sections[0];
+    sections.forEach(function (section) {
+      if (section.getBoundingClientRect().top <= 160) { current = section; }
+    });
+    document.querySelectorAll('.nav a').forEach(function (a) { a.classList.toggle('active', a.dataset.nav === current.id); });
+  }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
   document.getElementById('print-btn').addEventListener('click', function () { window.print(); });
 })();
 </script>

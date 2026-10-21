@@ -214,6 +214,51 @@ details.answer-box summary { cursor: pointer; font-weight: 700; color: var(--acc
 details.answer-box[open] { padding-bottom: 16px; }
 .footer { color: var(--muted); font-size: 12px; text-align: center; padding: 26px 0 0; }
 .kbd { font-family: monospace; background: var(--bg-soft); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; font-size: .85em; }
+
+.term-toolbar {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px;
+  margin: 20px 0 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--bg-soft);
+}
+.term-toolbar label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+.term-toolbar input {
+  width: min(480px, 72vw); border: 1px solid var(--line); border-radius: 9px;
+  padding: 8px 10px; background: var(--panel); color: var(--ink); font: inherit; font-size: 13px;
+}
+.term-toolbar input:focus { outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent); border-color: var(--accent); }
+#term-count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.term-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
+.term-card {
+  border: 1px solid var(--line); border-radius: 16px; background: var(--panel);
+  padding: 16px; box-shadow: 0 8px 20px rgba(22,32,51,.045); scroll-margin-top: 20px;
+}
+.term-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.term-index {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px;
+  display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  color: var(--accent); font-weight: 800; font-size: 11px;
+}
+.term-title { min-width: 0; flex: 1; }
+.term-title h3 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
+.term-title h3 small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; margin-top: 2px; }
+.term-oneline { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+.term-group {
+  flex: 0 0 auto; border-radius: 99px; padding: 3px 8px; font-size: 10px;
+  color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 11%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 25%, var(--line));
+}
+.term-fields { display: grid; gap: 8px; }
+.term-field { border-top: 1px dashed var(--line); padding-top: 8px; }
+.term-field:first-child { border-top: 0; padding-top: 0; }
+.term-label { display: block; font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--accent); text-transform: uppercase; margin-bottom: 2px; }
+.term-field p { margin: 0; font-size: 12.5px; line-height: 1.6; }
+.term-where p { font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace; font-size: 11.5px; color: var(--muted); word-break: break-word; }
+.term-warn { background: color-mix(in srgb, var(--warning) 7%, transparent); border-radius: 8px; padding: 7px 8px; }
+.term-warn .term-label { color: var(--warning); }
+.term-empty { color: var(--muted); text-align: center; padding: 18px; }
+[hidden] { display: none !important; }
+@media (max-width: 900px) { .term-grid { grid-template-columns: 1fr; } .term-toolbar input { width: 100%; } }
+
 @media (max-width: 900px) {
   :root { --sidebar: 0px; }
   .app { display: block; }
@@ -267,6 +312,8 @@ def read_md(name):
 
 def render_md(name):
     text = read_md(name)
+    if name == "01-terminology.zh.md":
+        text = re.sub(r'<!-- TERMINOLOGY_DETAILS_START -->.*?<!-- TERMINOLOGY_DETAILS_END -->', '<div id="terminology-cards"></div>', text, flags=re.S)
     rendered = markdown.markdown(text, extensions=MARKDOWN_EXT)
     rendered = re.sub(r"<h1>.*?</h1>", "", rendered, count=1, flags=re.S)
     links = {
@@ -284,6 +331,9 @@ def render_md(name):
         rendered = rendered.replace('href="' + old + '"', 'href="' + new + '"')
     if name == "02-architecture.zh.md":
         rendered = re.sub(r'<pre><code class="language-mermaid">.*?</code></pre>', DIAGRAM, rendered, count=1, flags=re.S)
+    if name == "01-terminology.zh.md":
+        fragment = (LEARN / "terminology-fragment.html").read_text(encoding="utf-8")
+        rendered = rendered.replace('<div id="terminology-cards"></div>', '<h2>术语详解</h2>\n' + fragment)
     return rendered
 
 DIAGNOSTIC = [
@@ -480,16 +530,36 @@ JS = """
     pre.appendChild(button);
   });
 
-  var sections = Array.prototype.slice.call(document.querySelectorAll('section[data-section]'));
-  if ('IntersectionObserver' in window) {
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) { return; }
-        document.querySelectorAll('.nav a').forEach(function (a) { a.classList.toggle('active', a.dataset.nav === entry.target.id); });
+  var termSearch = document.getElementById('term-search');
+  if (termSearch) {
+    var termCards = Array.prototype.slice.call(document.querySelectorAll('.term-card'));
+    var termCount = document.getElementById('term-count');
+    var termEmpty = document.getElementById('term-empty');
+    var filterTerms = function () {
+      var query = termSearch.value.trim().toLowerCase();
+      var shown = 0;
+      termCards.forEach(function (card) {
+        var match = !query || card.dataset.search.indexOf(query) >= 0;
+        card.hidden = !match;
+        if (match) { shown += 1; }
       });
-    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0.01 });
-    sections.forEach(function (section) { observer.observe(section); });
+      termCount.textContent = shown + ' / ' + termCards.length + ' 个术语';
+      termEmpty.hidden = shown !== 0;
+    };
+    termSearch.addEventListener('input', filterTerms);
+    filterTerms();
   }
+
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section[data-section]'));
+  function updateNav() {
+    var current = sections[0];
+    sections.forEach(function (section) {
+      if (section.getBoundingClientRect().top <= 160) { current = section; }
+    });
+    document.querySelectorAll('.nav a').forEach(function (a) { a.classList.toggle('active', a.dataset.nav === current.id); });
+  }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
   document.getElementById('print-btn').addEventListener('click', function () { window.print(); });
 })();
 """

@@ -2,7 +2,7 @@
 
 > **用户阅读版（推荐）：[index.html](index.html)** — 自包含 HTML，带目录、进度、答题卡和答案导出；下面这些 Markdown 是 Agent/仓库维护用的源文件。
 >
-> 在线版：<https://lsp725jk.github.io/deepseek-harness-linux/>。修改 MD 后运行 `python learning/build-html.py` 重新生成 HTML，并把 `index.html` 同步到 `gh-pages` 分支的根目录。
+> 在线版：<https://lsp725jk.github.io/deepseek-harness-linux/>。术语详解的源数据在 `terminology.json`；修改后先运行 `python learning/build-terminology.py`，再运行 `python learning/build-html.py` 重新生成 HTML，并把 `index.html` 同步到 `gh-pages` 分支的根目录。
 
 这是一套面向开发者的三模块课程：先建立术语，再建立架构地图，最后读代码并做小改动；学完后用迁移测试检验是否真的理解，而不是记住结论。
 
@@ -39,6 +39,7 @@
 - [03-code-implementation.zh.md](03-code-implementation.zh.md)：源码阅读路线和小练习。
 - [04-transfer-assessment.zh.md](04-transfer-assessment.zh.md)：迁移测试题目与评分标准。
 - [answer-key.zh.md](answer-key.zh.md)：参考答案；建议做完再打开。
+- [terminology.json](terminology.json)：43 个术语的结构化详解源（官方定义/用途/原理/范围/混淆/验证）。
 
 ## 重要原则
 
