@@ -3,6 +3,8 @@
 English | [中文](README.zh.md)
 
 > **Linux x64 port:** see [LINUX.zh.md](LINUX.zh.md) for AppImage/deb usage and build steps.
+>
+> **学习与迁移课:** see [learning/README.zh.md](learning/README.zh.md) for terminology, architecture, code reading, and assessment.
 
 DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
 
