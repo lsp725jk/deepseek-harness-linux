@@ -1,5 +1,7 @@
 # DeepSeek Harness Linux x64
 
+[![Linux desktop package](https://github.com/lsp725jk/deepseek-harness-linux/actions/workflows/linux-desktop.yml/badge.svg)](https://github.com/lsp725jk/deepseek-harness-linux/actions/workflows/linux-desktop.yml)
+
 本仓库是 [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) 的 Linux x64 适配分支；基于 tag `dsh-v0.2.1-rc.2`（commit `687f282e`）。上游为 MIT 协议。
 
 ## 直接使用（Ubuntu / Debian）
