@@ -1,0 +1,1508 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek Harness 学习与迁移课</title>
+<meta name="description" content="DeepSeek Harness 三模块学习课：术语、架构、代码实现与迁移测评。">
+<style>
+:root {
+  --bg: #f5f7fb;
+  --bg-soft: #eef2f9;
+  --panel: #ffffff;
+  --ink: #162033;
+  --muted: #63708a;
+  --line: #dfe6f1;
+  --accent: #4f46e5;
+  --accent-2: #0f766e;
+  --accent-3: #b45309;
+  --code-bg: #101827;
+  --code-ink: #dbeafe;
+  --success: #047857;
+  --warning: #b45309;
+  --shadow: 0 18px 50px rgba(22, 32, 51, .08);
+  --radius: 18px;
+  --sidebar: 278px;
+}
+[data-theme="dark"] {
+  --bg: #0b1120;
+  --bg-soft: #111a2e;
+  --panel: #121c31;
+  --ink: #e8eef9;
+  --muted: #9aa8c0;
+  --line: #26344f;
+  --accent: #8b8cf8;
+  --accent-2: #5eead4;
+  --accent-3: #fbbf24;
+  --code-bg: #050a14;
+  --code-ink: #dbeafe;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --shadow: 0 22px 60px rgba(0, 0, 0, .35);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(1100px 500px at 8% -8%, rgba(79, 70, 229, .14), transparent 60%),
+    radial-gradient(900px 480px at 95% 4%, rgba(15, 118, 110, .12), transparent 55%),
+    var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.app { display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); min-height: 100vh; }
+.sidebar {
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  padding: 26px 20px 30px;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+.brand-mark {
+  width: 46px; height: 46px; border-radius: 14px;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff; font-weight: 800; letter-spacing: -.04em;
+  box-shadow: 0 10px 24px rgba(79, 70, 229, .25);
+}
+.brand strong { display: block; font-size: 17px; letter-spacing: -.02em; }
+.brand small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.nav-label { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin: 18px 10px 8px; }
+.nav { display: grid; gap: 4px; }
+.nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 11px;
+  color: var(--muted); font-size: 14px; font-weight: 600;
+}
+.nav a:hover { background: var(--bg-soft); color: var(--ink); text-decoration: none; }
+.nav a.active { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.nav-num {
+  width: 24px; height: 24px; border-radius: 8px;
+  display: grid; place-items: center; font-size: 11px;
+  background: var(--bg-soft); color: var(--muted);
+}
+.nav a.active .nav-num { background: var(--accent); color: #fff; }
+.progress-box { margin-top: 24px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-soft); }
+.progress-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.progress-track { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .25s ease; }
+.side-actions { display: flex; gap: 8px; margin-top: 14px; }
+.side-btn, .btn {
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  border-radius: 10px; padding: 8px 11px; font: inherit; font-size: 12px; cursor: pointer;
+}
+.side-btn:hover, .btn:hover { border-color: var(--accent); color: var(--accent); }
+.main { min-width: 0; }
+.topbar {
+  display: none; position: sticky; top: 0; z-index: 20;
+  align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 92%, transparent); backdrop-filter: blur(10px);
+}
+.topbar button { border: 1px solid var(--line); background: var(--panel); border-radius: 9px; padding: 7px 10px; color: var(--ink); }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 40px 42px 80px; }
+.hero {
+  position: relative; overflow: hidden;
+  border-radius: 26px; padding: 38px 38px 32px;
+  background: linear-gradient(135deg, #1f2554 0%, #343a86 45%, #0f766e 100%);
+  color: #fff; box-shadow: var(--shadow);
+}
+.hero::after {
+  content: ""; position: absolute; width: 340px; height: 340px; right: -100px; top: -130px;
+  border-radius: 50%; background: rgba(255,255,255,.12); filter: blur(2px);
+}
+.eyebrow { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; opacity: .78; font-weight: 700; }
+.hero h1 { font-size: clamp(28px, 4.2vw, 48px); line-height: 1.15; margin: 10px 0 12px; letter-spacing: -.045em; }
+.hero p { max-width: 760px; margin: 0; color: rgba(255,255,255,.82); font-size: 15px; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.pill { border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.10); padding: 6px 10px; border-radius: 99px; font-size: 12px; color: #fff; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 15px; padding: 14px 15px; box-shadow: 0 8px 22px rgba(22,32,51,.04); }
+.stat strong { display: block; font-size: 22px; letter-spacing: -.03em; }
+.stat span { color: var(--muted); font-size: 12px; }
+.section {
+  margin-top: 26px; padding: 30px 32px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); scroll-margin-top: 22px;
+}
+.chapter { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+.chapter-left { display: flex; gap: 12px; align-items: flex-start; }
+.chapter-num {
+  width: 38px; height: 38px; flex: 0 0 auto; border-radius: 12px;
+  display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff; font-weight: 800; font-size: 13px; box-shadow: 0 8px 18px rgba(79,70,229,.2);
+}
+.chapter h2 { margin: 0; font-size: 23px; letter-spacing: -.03em; }
+.chapter p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.done-btn { white-space: nowrap; }
+.done-btn.done { background: color-mix(in srgb, var(--success) 14%, transparent); border-color: color-mix(in srgb, var(--success) 45%, var(--line)); color: var(--success); }
+.content { font-size: 15px; }
+.content > h1:first-child { display: none; }
+.content h2 { margin: 32px 0 10px; font-size: 20px; letter-spacing: -.025em; scroll-margin-top: 20px; }
+.content h3 { margin: 24px 0 8px; font-size: 16px; }
+.content p { margin: 10px 0; }
+.content ul, .content ol { padding-left: 22px; margin: 10px 0; }
+.content li { margin: 5px 0; }
+.content strong { color: var(--ink); }
+.content code {
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: .88em; background: var(--bg-soft); border: 1px solid var(--line);
+  padding: 1px 5px; border-radius: 6px;
+}
+.content pre {
+  position: relative; margin: 16px 0; padding: 18px 18px;
+  background: var(--code-bg); color: var(--code-ink);
+  border-radius: 14px; overflow: auto; line-height: 1.6;
+  border: 1px solid rgba(255,255,255,.08);
+}
+.content pre code { background: transparent; border: 0; padding: 0; color: inherit; font-size: 12.5px; }
+.copy-code {
+  position: absolute; right: 10px; top: 8px; border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.10); color: #fff; border-radius: 7px; padding: 3px 7px;
+  font-size: 11px; cursor: pointer; opacity: .65;
+}
+.copy-code:hover { opacity: 1; }
+.content table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+.content th, .content td { border: 1px solid var(--line); padding: 9px 10px; vertical-align: top; text-align: left; }
+.content th { background: var(--bg-soft); font-weight: 700; }
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+.table-wrap table { margin: 0; }
+.content blockquote { margin: 16px 0; padding: 10px 16px; border-left: 4px solid var(--accent); background: var(--bg-soft); color: var(--muted); border-radius: 0 10px 10px 0; }
+.content hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
+.content a { font-weight: 600; }
+.diagram {
+  margin: 18px 0; padding: 18px; border: 1px dashed color-mix(in srgb, var(--accent) 40%, var(--line));
+  border-radius: 16px; background: var(--bg-soft);
+}
+.flow-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+.flow-box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; font-size: 12px; font-weight: 700; box-shadow: 0 4px 10px rgba(22,32,51,.04); }
+.flow-box.primary { border-color: var(--accent); color: var(--accent); }
+.flow-box.green { border-color: var(--accent-2); color: var(--accent-2); }
+.flow-arrow { color: var(--muted); font-weight: 800; }
+.flow-label { text-align: center; color: var(--muted); font-size: 11px; margin: 4px 0; }
+.quiz-card, .answer-card {
+  margin: 18px 0 24px; padding: 20px; border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, var(--panel)), var(--panel));
+}
+.quiz-card h2, .answer-card h2 { margin: 0 0 4px; font-size: 18px; }
+.quiz-card .hint, .answer-card .hint { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
+.q { margin: 12px 0; }
+.q label { display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 5px; }
+.q textarea, .big-answer {
+  width: 100%; min-height: 58px; resize: vertical;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink);
+  padding: 9px 10px; font: inherit; font-size: 13.5px; line-height: 1.55;
+}
+.q textarea:focus, .big-answer:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); border-color: var(--accent); }
+.big-answer { min-height: 180px; margin-top: 6px; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.status { color: var(--muted); font-size: 12px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { color: #fff; filter: brightness(1.05); }
+details.answer-box { margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-soft); padding: 10px 14px; }
+details.answer-box summary { cursor: pointer; font-weight: 700; color: var(--accent-3); }
+details.answer-box[open] { padding-bottom: 16px; }
+.footer { color: var(--muted); font-size: 12px; text-align: center; padding: 26px 0 0; }
+.kbd { font-family: monospace; background: var(--bg-soft); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; font-size: .85em; }
+@media (max-width: 900px) {
+  :root { --sidebar: 0px; }
+  .app { display: block; }
+  .sidebar { position: fixed; z-index: 30; left: 0; top: 0; width: 280px; transform: translateX(-102%); transition: transform .2s ease; }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 0 60px rgba(0,0,0,.25); }
+  .topbar { display: flex; }
+  .wrap { padding: 24px 16px 60px; }
+  .hero { padding: 28px 22px; border-radius: 20px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .section { padding: 22px 18px; }
+  .chapter { flex-direction: column; }
+}
+@media (max-width: 520px) {
+  .stat-grid { grid-template-columns: 1fr; }
+  .chapter h2 { font-size: 20px; }
+}
+@media print {
+  .sidebar, .topbar, .done-btn, .side-actions, .row-actions, .copy-code { display: none !important; }
+  .app { display: block; }
+  .wrap { max-width: none; padding: 0; }
+  .section, .hero { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">DSH</div><div><strong>DeepSeek Harness</strong><small>学习与迁移课 · v1</small></div></div>
+    <div class="nav-label">课程目录</div>
+    <nav class="nav"><a href="#overview" data-nav="overview"><span class="nav-num">00</span><span>课程地图</span></a><a href="#m1" data-nav="m1"><span class="nav-num">01</span><span>专业术语</span></a><a href="#m2" data-nav="m2"><span class="nav-num">02</span><span>项目架构</span></a><a href="#m3" data-nav="m3"><span class="nav-num">03</span><span>代码实现</span></a><a href="#m4" data-nav="m4"><span class="nav-num">04</span><span>迁移能力测评</span></a><a href="#answers" data-nav="answers"><span class="nav-num">A</span><span>参考答案</span></a></nav>
+    <div class="progress-box">
+      <div class="progress-top"><span>学习进度</span><span id="progress-text">0 / 6 节</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="side-actions"><button class="side-btn" id="theme-toggle" type="button">深色</button><button class="side-btn" id="print-btn" type="button">打印 / PDF</button></div>
+    </div>
+    <div class="progress-box" style="margin-top:12px">
+      <div class="progress-top"><span>阅读约定</span></div>
+      <div style="font-size:12px;color:var(--muted)">MD 给 Agent 与仓库维护；这个 HTML 是给你阅读、做题和导出的版本。答案只保存在本机浏览器。</div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar"><button id="menu-toggle" type="button">目录</button><strong>DSH 学习课</strong><span style="font-size:12px;color:var(--muted)">HTML</span></div>
+    <div class="wrap">
+      <header class="hero">
+        <div class="eyebrow">DeepSeek Harness · Linux port study guide</div>
+        <h1>从术语到迁移：真正读懂 DSH</h1>
+        <p>不背目录。先建立五个心智模型，再沿真实代码追踪一次 turn，最后用迁移任务检验你是否能把同样的判断用到新项目。</p>
+        <div class="hero-meta"><span class="pill">3 个学习模块</span><span class="pill">5 题诊断</span><span class="pill">20 题结课</span><span class="pill">4 个迁移任务</span><span class="pill">答案本地保存</span></div>
+      </header>
+      <div class="stat-grid">
+        <div class="stat"><strong>3</strong><span>学习模块</span></div>
+        <div class="stat"><strong>5</strong><span>开课诊断题</span></div>
+        <div class="stat"><strong>20</strong><span>结课问题</span></div>
+        <div class="stat"><strong>4</strong><span>迁移任务（选 2）</span></div>
+      </div>
+      <section class="section" id="overview" data-section="overview"><div class="chapter"><div class="chapter-left"><div class="chapter-num">00</div><div><h2>课程地图</h2><p>先读这一页，再按顺序进入三个模块</p></div></div><button class="btn done-btn" type="button" data-done="overview">标记完成</button></div><div class="quiz-card" id="diagnostic"><h2>开课前：5 题诊断</h2><p class="hint">不查资料，写 1–2 句话即可；答案保存在本机浏览器，不会上传。</p><div class="q"><label for="diag-1">1. Turn 和 Step 的区别？一个 turn 可以有几个 step？</label><textarea id="diag-1" data-diag="1" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-2">2. Profile、Bundle、Patch 谁覆盖谁？覆盖 config 是深合并还是替换？</label><textarea id="diag-2" data-diag="2" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-3">3. Plugin、Service、Tool 三者关系？各举一个 DSH 例子。</label><textarea id="diag-3" data-diag="3" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-4">4. Host 和 Client 的边界？Desktop Host 与 Electron main 的区别？</label><textarea id="diag-4" data-diag="4" placeholder="你的回答…"></textarea></div><div class="q"><label for="diag-5">5. 新增只读查数据库工具，先改 core 还是扩展点？最小文件清单是什么？</label><textarea id="diag-5" data-diag="5" placeholder="你的回答…"></textarea></div><div class="row-actions"><button class="btn primary" type="button" onclick="saveAnswers()">保存答案</button><button class="btn" type="button" onclick="exportAnswers()">复制 / 下载为 Markdown</button><span class="status" id="answer-status">未保存</span></div></div><div class="content">
+<blockquote>
+<p><strong>用户阅读版（推荐）：<a href="index.html">index.html</a></strong> — 自包含 HTML，带目录、进度、答题卡和答案导出；下面这些 Markdown 是 Agent/仓库维护用的源文件。</p>
+</blockquote>
+<p>这是一套面向开发者的三模块课程：先建立术语，再建立架构地图，最后读代码并做小改动；学完后用迁移测试检验是否真的理解，而不是记住结论。</p>
+<h2>适合谁</h2>
+<ul>
+<li>会 TypeScript / Node.js，能用 Git 和终端。</li>
+<li>用过至少一个 AI coding agent，但没有读过 DSH 源码。</li>
+<li>目标不是背 API，而是能判断“新需求应该落在哪个插件、哪个 seam、哪个事件”。</li>
+</ul>
+<h2>三个模块</h2>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>你会得到什么</th>
+<th>验收方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 术语</td>
+<td>用准确词汇描述 DSH 的运行、装配、扩展和持久化</td>
+<td>术语闭卷测验</td>
+</tr>
+<tr>
+<td>2. 架构</td>
+<td>能从 CLI/Desktop 入口画到插件树、Host、Session 和工具执行</td>
+<td>架构口述 + 三张图</td>
+</tr>
+<tr>
+<td>3. 代码</td>
+<td>能沿真实文件追踪一次 turn，并新增一个只读工具</td>
+<td>代码阅读题 + 小改动</td>
+</tr>
+</tbody>
+</table>
+<h2>建议节奏</h2>
+<ul>
+<li>第 1 天：模块 1 + 模块 2 前半，约 90 分钟。</li>
+<li>第 2 天：模块 2 后半 + 模块 3，约 120 分钟。</li>
+<li>第 3 天：做迁移测试；把答案或代码发给我，我按 rubric 评分并指出下一步。</li>
+</ul>
+<h2>学习法：三遍法</h2>
+<ol>
+<li><strong>地图遍</strong>：只看目录、README 和架构图，不追细节；目标是知道东西在哪。</li>
+<li><strong>追踪遍</strong>：选一条真实路径（例如一次 turn 或一次 CLI 启动），每读一个文件只回答“它负责什么、它依赖谁、谁调用它”。</li>
+<li><strong>改动遍</strong>：做最小改动（优先新增插件，不改核心），用测试和 <code>dump-config</code> 验证。</li>
+</ol>
+<h2>文件</h2>
+<ul>
+<li><a href="#m1">01-terminology.zh.md</a>：术语与易混点。</li>
+<li><a href="#m2">02-architecture.zh.md</a>：架构、启动、turn 数据流和扩展点。</li>
+<li><a href="#m3">03-code-implementation.zh.md</a>：源码阅读路线和小练习。</li>
+<li><a href="#m4">04-transfer-assessment.zh.md</a>：迁移测试题目与评分标准。</li>
+<li><a href="#answers">answer-key.zh.md</a>：参考答案；建议做完再打开。</li>
+</ul>
+<h2>重要原则</h2>
+<ul>
+<li>不要一开始改 <code>packages/core/agent-loop</code> 或 <code>packages/core/session</code>；先通过 bundle、tool、provider、client UI 这些扩展点做事。</li>
+<li>任何模型可见输入都必须能从 Session 日志重建；看到“只在内存里加了一段 prompt”的实现，先怀疑它。</li>
+<li>注册都要能回滚：新服务、工具、监听器、UI 槽位都应通过 <code>ctx.effect</code> 或注册返回的 disposer 管理。</li>
+<li>先读 <code>README.md</code> 和架构文档，再读源码；DSH 的命名很精确，术语错位会导致后面全错。</li>
+</ul>
+<h2>开始之前</h2>
+<p>先做 <a href="#m4">04-transfer-assessment.zh.md</a> 的“诊断 8 题”，把答案留在手边；学完三个模块后再做一次，对比两次答案。诊断不计分，只用来定位你的起点。</p></div></section><section class="section" id="m1" data-section="m1"><div class="chapter"><div class="chapter-left"><div class="chapter-num">01</div><div><h2>专业术语</h2><p>先把词用对：Turn、Step、Plugin、Service、Tool、Profile、Bundle、Patch</p></div></div><button class="btn done-btn" type="button" data-done="m1">标记完成</button></div><div class="content">
+<p>目标：看到 DSH 的文档、日志或代码时，能准确说出每个词指的是哪一层，不把“插件、服务、工具、bundle”混成一类。</p>
+<h2>1. 运行时与执行</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>一句话定义</th>
+<th>在 DSH 里看哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent harness</td>
+<td>驱动模型、工具、会话和上下文的基础设施；本身不是模型</td>
+<td>整个仓库</td>
+</tr>
+<tr>
+<td>Agent</td>
+<td>一次可创建、可恢复、可取消的智能体实例</td>
+<td><code>packages/core/agent</code></td>
+</tr>
+<tr>
+<td>Turn</td>
+<td>一轮用户可见的请求；从 <code>turn/start</code> 到 <code>turn/end</code></td>
+<td><code>packages/core/agent-loop</code></td>
+</tr>
+<tr>
+<td>Step</td>
+<td>一次模型请求及其后的工具阶段；一个 turn 可以有多 step</td>
+<td><code>agent-loop/src/agent.ts</code> 的 <code>step()</code></td>
+</tr>
+<tr>
+<td>Session</td>
+<td>一次对话的持久化事实源，通常是 append-only 事件日志</td>
+<td><code>packages/core/session</code></td>
+</tr>
+<tr>
+<td>SessionEvent</td>
+<td>写入 Session 的类型化记录，例如 <code>turn/start</code>、<code>tool/result</code></td>
+<td><code>session/src/types.ts</code> 的声明合并</td>
+</tr>
+<tr>
+<td>model-visible ⟺ logged</td>
+<td>任何进入模型请求的内容，都必须能从 Session 日志重建</td>
+<td><code>docs/architecture.md</code></td>
+</tr>
+<tr>
+<td>Replay</td>
+<td>从日志重建消息、工具历史、UI 状态</td>
+<td><code>deriveMessages</code>、Session projection</td>
+</tr>
+<tr>
+<td>Inbox</td>
+<td>Agent 的待处理输入队列；followup/steer/inject 进入不同位置</td>
+<td><code>packages/core/agent-loop/src/inbox.ts</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>易错</strong>：Turn 不是 Step。一个 turn 里模型可以先请求工具，拿到结果后再请求一次；第二次请求是新的 step，不是新的 turn。</p>
+<h2>2. 组合：Cordis、插件、服务</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>一句话定义</th>
+<th>在 DSH 里看哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cordis</td>
+<td>DSH 使用的插件/服务/事件运行时</td>
+<td><code>vendor/cordis</code></td>
+</tr>
+<tr>
+<td>Context（<code>ctx</code>）</td>
+<td>插件看到的运行时上下文；服务、事件、effect 都挂在它上面</td>
+<td><code>@deepseek-ai/cordis</code></td>
+</tr>
+<tr>
+<td>Plugin</td>
+<td>一段可加载/卸载的代码，通常导出 <code>name</code>、<code>inject</code>、<code>Config</code>、<code>apply</code></td>
+<td>各 package 的 <code>src/index.ts</code></td>
+</tr>
+<tr>
+<td>Service</td>
+<td>挂在 <code>ctx</code> 上的能力对象，例如 <code>ctx.tools</code>、<code>ctx.sessions</code>、<code>ctx.llm</code></td>
+<td><code>packages/*/*/src/index.ts</code></td>
+</tr>
+<tr>
+<td>Service Definition</td>
+<td>定义能力接口和语义的包，不提供具体实现</td>
+<td>例如 <code>packages/sandbox/sandbox</code></td>
+</tr>
+<tr>
+<td>Provider</td>
+<td>实现某个 Service Definition 的包</td>
+<td>例如 <code>packages/sandbox/sandbox-local</code></td>
+</tr>
+<tr>
+<td>Consumer</td>
+<td>使用某个服务的包</td>
+<td>例如 <code>packages/shell/tool-bash</code></td>
+</tr>
+<tr>
+<td>Capability seam</td>
+<td>Definition / Provider / Consumer 三角色组成的能力接缝</td>
+<td><code>docs/architecture.md</code></td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>由 <code>ctx.effect()</code> 管理的注册，卸载时自动回滚</td>
+<td>任何注册服务、工具、监听器的插件</td>
+</tr>
+<tr>
+<td>Disposer</td>
+<td>注册返回的清理函数；卸载插件或销毁 fiber 时调用</td>
+<td><code>ctx.effect</code>、<code>ctx.on</code>、<code>register</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>易错</strong>：Plugin 不是 Service，也不是 Tool。插件是加载单位；服务是它向 <code>ctx</code> 提供的能力；工具是它注册给模型的能力之一。</p>
+<h2>3. 装配：Profile、Bundle、Patch</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>一句话定义</th>
+<th>在 DSH 里看哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Profile</td>
+<td>一个命名运行配置，位于 <code>$DSH_HOME/profiles/&lt;name&gt;</code>，由 package.json 与 patch 文件描述</td>
+<td><code>packages/boot/app-boot/src/profile.ts</code></td>
+</tr>
+<tr>
+<td>Bundle</td>
+<td>以 npm 包分发的一组 Cordis 配置行，通过 <code>dsh.bundle</code> 指向 patch</td>
+<td><code>packages/bundle/*/cordis.patch.yml</code></td>
+</tr>
+<tr>
+<td>Patch</td>
+<td>YAML 覆盖层；按 <code>id</code> 定位行，后写覆盖前写</td>
+<td><code>packages/bundle/base/cordis.patch.yml</code></td>
+</tr>
+<tr>
+<td>Loader</td>
+<td>读取 Cordis 配置、解析服务依赖并激活插件的运行时</td>
+<td><code>@deepseek-ai/cordis-plugin-loader</code></td>
+</tr>
+<tr>
+<td>Composition</td>
+<td>把多个 patch 层合成为最终插件树</td>
+<td><code>composeEntries</code>、<code>prepareProfileEntries</code></td>
+</tr>
+<tr>
+<td>Overlay</td>
+<td>叠加的配置层；命令行 <code>--patch</code> 是最后一层</td>
+<td><code>apps/cli/src/profile-boot.ts</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>装配顺序</strong>：bundle patch → profile 的 <code>cordis.patch.yml</code> → <code>$DSH_HOME/cordis.patch.yml</code> → 命令行 <code>--patch</code>；后面的层覆盖前面的同 <code>id</code> 行。</p>
+<p><strong>易错</strong>：Profile 不是“用户设置”，Bundle 也不是“插件包”的同义词。Profile 是装配结果，Bundle 是可复用的一组配置行。</p>
+<h2>4. 模型与能力</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>一句话定义</th>
+<th>在 DSH 里看哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tool</td>
+<td>模型可调用的能力：有 name、description、参数 schema、execute 和 presentation</td>
+<td><code>packages/core/tools</code>、<code>packages/fs/tool-fs</code></td>
+</tr>
+<tr>
+<td>Tool registry</td>
+<td>保存工具定义、可见性、权限和执行的注册表</td>
+<td><code>ctx.tools</code></td>
+</tr>
+<tr>
+<td>Tool call / result</td>
+<td>模型请求执行工具，以及执行业务返回的结构化结果</td>
+<td>Session 的 <code>tool/call</code>、<code>tool/result</code></td>
+</tr>
+<tr>
+<td>Skill</td>
+<td>可加载的指令/脚本知识包，通常通过 skill 工具读取</td>
+<td><code>packages/skill</code>、<code>packages/skill/skill-office</code></td>
+</tr>
+<tr>
+<td>MCP</td>
+<td>外部工具/资源服务器协议；DSH 通过 MCP client 接入</td>
+<td><code>packages/mcp/mcp-client</code></td>
+</tr>
+<tr>
+<td>Subagent</td>
+<td>由主 Agent 派生、拥有自己 Session 的子智能体</td>
+<td><code>packages/subagent</code></td>
+</tr>
+<tr>
+<td>Workflow</td>
+<td>由多个节点/工具步骤组成的编排能力</td>
+<td><code>packages/workflow</code></td>
+</tr>
+<tr>
+<td>PTC</td>
+<td>Programmatic Tool Calling；模型写程序调用工具，而不是逐条 function call</td>
+<td><code>packages/ptc-runtime</code></td>
+</tr>
+<tr>
+<td>Compaction</td>
+<td>压缩上下文，控制 token 预算</td>
+<td><code>packages/compaction</code></td>
+</tr>
+<tr>
+<td>Sandbox</td>
+<td>对进程/文件访问做限制的策略与实现</td>
+<td><code>packages/sandbox</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>易错</strong>：Skill 通常不是 Tool。Tool 是模型可直接调用的动作；Skill 是一段被读取/加载的知识或流程，可能再调用工具。</p>
+<h2>5. 载体与界面</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>一句话定义</th>
+<th>在 DSH 里看哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Host</td>
+<td>运行 Cordis 插件树和 Session 的 Node 进程</td>
+<td><code>packages/bundle/web-app</code>、<code>apps/desktop-host</code></td>
+</tr>
+<tr>
+<td>Client</td>
+<td>浏览器/Electron 渲染层，通过 HTTP/WS 投影 Host 状态</td>
+<td><code>packages/client</code></td>
+</tr>
+<tr>
+<td>Web Host</td>
+<td>提供 HTTP/WS、API gateway、静态前端的 Host 能力</td>
+<td><code>packages/host/webserver</code>、<code>packages/api/gateway</code></td>
+</tr>
+<tr>
+<td>Desktop Host</td>
+<td>桌面版实际运行 Host 的子进程，不是 Electron main</td>
+<td><code>apps/desktop-host</code></td>
+</tr>
+<tr>
+<td>Electron shell</td>
+<td>只负责窗口、菜单、协议、目录选择等壳能力</td>
+<td><code>apps/desktop/src/main.ts</code></td>
+</tr>
+<tr>
+<td>Primary runtime</td>
+<td>打包进桌面的 Node/Python/pnpm 解释器与依赖</td>
+<td><code>apps/desktop/scripts/prepare-runtime.ts</code></td>
+</tr>
+<tr>
+<td>Headless</td>
+<td>不启动 UI 的一次性 CLI 运行 profile</td>
+<td><code>packages/bundle/headless</code></td>
+</tr>
+<tr>
+<td>ACP</td>
+<td>通过 stdio 接入的自动化协议载体</td>
+<td><code>packages/bundle/acp-app</code></td>
+</tr>
+<tr>
+<td>SDK</td>
+<td>TypeScript/Python 远程调用 Host 的客户端</td>
+<td><code>packages/sdk</code>、<code>python/sdk-runtime</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>易错</strong>：Desktop 不是另一套 harness。它只是 Electron 壳 + 私有 Desktop Host + 同一个 Web Host；核心插件树与 Web 版共用。</p>
+<h2>6. 持久化与验证</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>一句话定义</th>
+<th>在 DSH 里看哪里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Session format version</td>
+<td>Session 日志的兼容代际；只在新 reader 无法安全解释旧记录时递增</td>
+<td><code>packages/core/session/src/types.ts</code></td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td>把 Session 事件写入磁盘/数据库的实现</td>
+<td><code>packages/session/session-persistence-jsonl</code></td>
+</tr>
+<tr>
+<td>Projection</td>
+<td>从事件日志派生列表、标题、统计等读模型</td>
+<td><code>packages/session/session-projection</code></td>
+</tr>
+<tr>
+<td>Snapshot</td>
+<td>录制后回放的期望输出，用于 keyless 测试</td>
+<td><code>packages/test-support/session-snapshot</code></td>
+</tr>
+<tr>
+<td>Fixture</td>
+<td>测试输入或固定数据</td>
+<td>各 package 的 <code>tests/fixtures</code></td>
+</tr>
+<tr>
+<td>Smoke</td>
+<td>打包后跑真实进程的最小验收，不是单元测试</td>
+<td><code>apps/desktop/scripts/smoke-runtime.ts</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>易错</strong>：Projection 不是事实源；它从 Session 日志派生。日志才是可以重放的事实。</p>
+<h2>7. 闭卷自测</h2>
+<ol>
+<li>用一句话区分 Turn 和 Step。</li>
+<li>为什么“模型可见 ⟺ logged”是硬约束？举一个违反它的例子。</li>
+<li>Profile、Bundle、Patch 三者的关系是什么？</li>
+<li>Service Definition、Provider、Consumer 各举一个 DSH 例子。</li>
+<li>为什么 Desktop Host 不是 Electron main？</li>
+<li>Tool 和 Skill 的区别是什么？</li>
+<li>一个 Projection 能否成为 Session 的事实源？为什么？</li>
+<li><code>ctx.effect</code> 和手工 <code>removeListener</code> 的差别是什么？</li>
+</ol>
+<h2>8. 术语纠错练习</h2>
+<p>下面每句都有一处错误，请改正：</p>
+<ol>
+<li>“一个 turn 只包含一次模型请求。”</li>
+<li>“Plugin 就是 Tool，注册工具就是加载插件。”</li>
+<li>“Bundle 是用户目录下的运行配置，Profile 是 npm 包。”</li>
+<li>“Session projection 是事实源，日志只是缓存。”</li>
+<li>“Desktop 版有一套独立的 Agent Loop，和 Web 版不共享。”</li>
+</ol>
+<p>答案在 <a href="#answers">answer-key.zh.md</a> 的模块 1 部分。先写自己的答案，再对照。</p></div></section><section class="section" id="m2" data-section="m2"><div class="chapter"><div class="chapter-left"><div class="chapter-num">02</div><div><h2>项目架构</h2><p>从 CLI / Desktop 入口画到插件树、Host、Session 与工具执行</p></div></div><button class="btn done-btn" type="button" data-done="m2">标记完成</button></div><div class="content">
+<p>目标：能在白板上画出“从命令/窗口到模型请求和工具执行”的完整路径，并判断一个新需求应该落在哪个扩展点。</p>
+<h2>1. 五个心智模型</h2>
+<p>先记住这五句话，后面所有细节都挂在它们下面：</p>
+<ol>
+<li><strong>一切皆插件</strong>：没有需要打补丁的“特权内核”；服务、工具、UI、持久化都可替换。</li>
+<li><strong>组合是分层的</strong>：base bundle → 载体 bundle → profile patch → 用户 patch → 命令行 overlay，后写覆盖同 id 行。</li>
+<li><strong>Host 跑树，Client 做投影</strong>：Node Host 运行 Cordis 插件树和 Session；浏览器/Electron 只消费 HTTP/WS 与事件投影。</li>
+<li><strong>日志是事实源</strong>：Session 事件日志 append-only；模型消息、工具历史、UI 状态都能从日志重建。</li>
+<li><strong>平台载体很薄</strong>：Web、Desktop、CLI、SDK、ACP 都是同一套 base + 不同载体 bundle；Linux 移植主要是补发布链，不是重写核心。</li>
+</ol>
+<h2>2. 总览图</h2>
+
+<div class="diagram" role="img" aria-label="DSH 架构总览">
+  <div class="flow-label">载体</div>
+  <div class="flow-row"><span class="flow-box">CLI</span><span class="flow-box">Desktop</span><span class="flow-box">Web</span><span class="flow-box">SDK / ACP</span></div>
+  <div class="flow-label">↓</div>
+  <div class="flow-label">装配层</div>
+  <div class="flow-row"><span class="flow-box primary">app-boot / Loader</span><span class="flow-box">profile + bundles + patches</span></div>
+  <div class="flow-label">↓</div>
+  <div class="flow-label">Node Host：同一棵 Cordis 插件树</div>
+  <div class="flow-row">
+    <span class="flow-box green">agent-loop</span>
+    <span class="flow-box green">Session 日志</span>
+    <span class="flow-box green">tools registry</span>
+    <span class="flow-box green">LLM adapters</span>
+    <span class="flow-box green">web host / API</span>
+  </div>
+  <div class="flow-label">↓</div>
+  <div class="flow-row"><span class="flow-box">shell</span><span class="flow-box">fs / sandbox</span><span class="flow-box">python / Office</span><span class="flow-box">MCP</span></div>
+  <div class="flow-label">Client 只通过 HTTP/WS 消费投影</div>
+</div>
+
+<p>注意：图中的箭头是“主要依赖/调用”，不是全部；真实的激活顺序由 Loader 按服务可用性和 <code>inject</code> 决定，行顺序不是加载语义。</p>
+<h2>3. 目录地图</h2>
+<table>
+<thead>
+<tr>
+<th>目录</th>
+<th>职责</th>
+<th>先看什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apps/cli</code></td>
+<td>命令行入口、参数解析、profile 启动</td>
+<td><code>src/bin.ts</code>、<code>src/profile-boot.ts</code></td>
+</tr>
+<tr>
+<td><code>apps/desktop</code></td>
+<td>Electron 壳、打包、运行时准备</td>
+<td><code>src/main.ts</code>、<code>scripts/prepare-*</code></td>
+</tr>
+<tr>
+<td><code>apps/desktop-host</code></td>
+<td>桌面版真实 Host 进程、Office/更新/退出协调</td>
+<td><code>src/index.ts</code>、<code>src/cli.ts</code></td>
+</tr>
+<tr>
+<td><code>apps/web</code></td>
+<td>浏览器前端外壳</td>
+<td>与 client 插件配合</td>
+</tr>
+<tr>
+<td><code>packages/boot</code></td>
+<td>app-boot、profile、plugin manager、HMR</td>
+<td><code>app-boot/src/profile.ts</code></td>
+</tr>
+<tr>
+<td><code>packages/bundle</code></td>
+<td>base/web/headless/SDK/ACP 的配置行</td>
+<td><code>base/cordis.patch.yml</code>、<code>web-app/cordis.patch.yml</code></td>
+</tr>
+<tr>
+<td><code>packages/core</code></td>
+<td>Agent、Agent Loop、Session、Tools、System Prompt</td>
+<td><code>agent-loop/src/agent.ts</code>、<code>session/src/types.ts</code></td>
+</tr>
+<tr>
+<td><code>packages/host</code></td>
+<td>Web server、静态资源、目录选择、插件清单</td>
+<td><code>host/webserver</code></td>
+</tr>
+<tr>
+<td><code>packages/client</code></td>
+<td>浏览器插件、UI 槽位、状态投影</td>
+<td><code>client/ui-*</code></td>
+</tr>
+<tr>
+<td><code>packages/llm</code></td>
+<td>模型适配器、重试、token 计量</td>
+<td><code>llm/llm-deepseek</code></td>
+</tr>
+<tr>
+<td><code>packages/session</code></td>
+<td>Session 持久化、投影、标题、SQLite 查询</td>
+<td><code>session-persistence-jsonl</code></td>
+</tr>
+<tr>
+<td><code>packages/shell</code></td>
+<td>bash/pwsh 工具与沙箱适配</td>
+<td><code>tool-bash</code>、<code>bash-sandbox</code></td>
+</tr>
+<tr>
+<td><code>packages/fs</code></td>
+<td>文件服务、观察策略、read/write/edit 工具</td>
+<td><code>tool-fs</code></td>
+</tr>
+<tr>
+<td><code>packages/sandbox</code></td>
+<td>沙箱定义与本地实现</td>
+<td><code>sandbox</code>、<code>sandbox-local</code></td>
+</tr>
+<tr>
+<td><code>packages/test-support</code></td>
+<td>回放、mock、snapshot、loader smoke</td>
+<td><code>agent-loop-testkit</code></td>
+</tr>
+<tr>
+<td><code>docs</code></td>
+<td>架构、subsystems、cookbook、user 文档</td>
+<td><code>architecture.md</code>、<code>cordis-primer.md</code></td>
+</tr>
+</tbody>
+</table>
+<h2>4. 启动路径 A：CLI</h2>
+<pre><code class="language-text">用户输入 dsh --profile web
+  -&gt; apps/cli/src/bin.ts: runCli()
+  -&gt; parseDshArgs() 选择 mode=profile
+  -&gt; apps/cli/src/profile-boot.ts: runProfile()
+  -&gt; packages/boot/app-boot: loadLayeredEnv / loadProfile / Loader
+  -&gt; 读取 profile 的 package.json + bundles
+  -&gt; 合并 bundle patches + profile patch + user patch + --patch
+  -&gt; Loader 激活插件，等待服务可用
+  -&gt; web bundle 绑定 webServer，开始监听
+</code></pre>
+<p>关键点：</p>
+<ul>
+<li><code>runCli</code> 只做分发；真正的 profile 启动在 <code>profile-boot.ts</code>。</li>
+<li><code>dump-config</code> 也走同一套 profile 解析，只是不激活整棵树；它是你验证“装配结果”的第一工具。</li>
+<li>Loader 是服务可用性驱动的：配置文件里的行顺序不是启动顺序，插件通过 <code>inject</code> 声明依赖。</li>
+</ul>
+<h2>5. 启动路径 B：Desktop</h2>
+<pre><code class="language-text">Electron main (apps/desktop/src/main.ts)
+  -&gt; 创建 BrowserWindow，加载 dsh-app://app/
+  -&gt; spawn Desktop Host (ELECTRON_RUN_AS_NODE=1)
+  -&gt; apps/desktop-host/src/index.ts
+  -&gt; 复用 profile runner 加载 desktop profile
+  -&gt; base + web-app + desktop 专属 patch
+  -&gt; Web Host 监听 127.0.0.1 随机端口
+  -&gt; Host 通过 Node IPC 发 boot/ready（端口、token、cookie）
+  -&gt; 页面用这些信息连接 /api 与 WebSocket
+</code></pre>
+<p>关键点：</p>
+<ul>
+<li>Electron main 不跑插件树；它是窗口/菜单/协议/目录选择的外壳。</li>
+<li>Desktop Host 是 Node 进程，不是浏览器；它和 Web Host 是“同一个 Host 的桌面载体”。</li>
+<li>页面加载的是打包后的 Web 前端，但它仍然通过 HTTP/WS 和 Host 通信，不存在“桌面专属 Agent Loop”。</li>
+</ul>
+<h2>6. Profile 如何装配</h2>
+<p>一个 profile 至少包含：</p>
+<ul>
+<li><code>package.json</code>：<code>dsh.profile.bundles</code> 指定有序 bundle 列表。</li>
+<li><code>cordis.patch.yml</code>：该 profile 的覆盖层。</li>
+</ul>
+<p>一个 bundle 包包含：</p>
+<ul>
+<li><code>package.json</code> 的 <code>dsh.bundle</code> 指向 patch 文件。</li>
+<li>patch 文件里是一组 Cordis 行（insert/update/remove）。</li>
+</ul>
+<p>装配顺序：</p>
+<ol>
+<li>按 <code>dsh.profile.bundles</code> 顺序应用每个 bundle 的 patch。</li>
+<li>应用 profile 自己的 <code>cordis.patch.yml</code>。</li>
+<li>应用 <code>$DSH_HOME/cordis.patch.yml</code>。</li>
+<li>应用命令行 <code>--patch</code>。</li>
+</ol>
+<p>同 <code>id</code> 的行，后面的层覆盖前面的层。覆盖是整段 <code>config</code> 替换，不是深合并；所以每个覆盖层必须写出它负责的完整配置。</p>
+<p>例子：base 里有一行 <code>id: tools</code>，web-app 里可能再次出现 <code>id: tools</code> 来改 <code>mode</code>；最终只有一行生效，值来自最后一个包含该行的层。</p>
+<h2>7. 一次 Turn 的数据流</h2>
+<pre><code class="language-text">turn/start
+  claim inbox: 取 queued message / next-step input
+  assemble: system prompt sections + tool schemas
+  agent/pre-step
+  step/start
+  agent/request -&gt; prepareCall
+  append user/message; log request/header
+  llm/stream -&gt; assistant stream chunks
+  assistant/message | assistant/attempt
+  tool/call*
+    tools/pre-execute
+    tools/execute
+    tools/post-execute
+  tool/result*
+  step/end
+  有工具结果或新输入 -&gt; 下一个 step
+turn/end
+</code></pre>
+<p>需要记住的三条不变式：</p>
+<ol>
+<li><code>turn/start</code> 与 <code>turn/end</code> 成对；<code>step/start</code> 与 <code>step/end</code> 成对；取消/失败也要走收尾事件。</li>
+<li>模型请求头记录实际 provider/model、reasoning effort、max tokens；重放不能靠“当前默认值”猜。</li>
+<li>工具失败通常是一个 <code>tool/result</code>（isError），不是把整个 turn 直接炸掉；只有无法继续的请求/持久化错误才结束 turn。</li>
+</ol>
+<h2>8. Host 与 Client 的边界</h2>
+<p>Host 负责：</p>
+<ul>
+<li>插件树、Agent、Session、工具执行、模型调用。</li>
+<li>HTTP API、WebSocket 事件、静态前端资源。</li>
+<li>认证 cookie、loopback/trusted host 校验。</li>
+<li>把 Session 事件投影成 Client 可消费的 envelope。</li>
+</ul>
+<p>Client 负责：</p>
+<ul>
+<li>渲染会话、工具卡片、侧栏、设置、终端等。</li>
+<li>通过 API/WS 发命令，订阅投影；不直接读 Host 文件或跑 Agent。</li>
+<li>用 UI 插件（<code>packages/client/ui-*</code>）向槽位注册组件。</li>
+</ul>
+<p>判断一个需求该放哪边：</p>
+<ul>
+<li>改变“模型能做什么/何时做” → Host 侧插件或工具。</li>
+<li>改变“用户看到什么/怎么点” → Client 侧 UI 插件。</li>
+<li>只有两边都要改时，才同时新增 Host 事件/投影与 Client 呈现。</li>
+</ul>
+<h2>9. 扩展点速查</h2>
+<table>
+<thead>
+<tr>
+<th>想做的事</th>
+<th>首选扩展点</th>
+<th>不要先改</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>新增模型调用工具</td>
+<td>新 tool 包 + <code>ctx.tools.register</code> + bundle patch</td>
+<td>agent-loop</td>
+</tr>
+<tr>
+<td>接入新模型供应商</td>
+<td><code>packages/llm/*</code> 的适配器实现</td>
+<td>session/agent-loop</td>
+</tr>
+<tr>
+<td>改变文件读写策略</td>
+<td><code>fs</code> / <code>fs-observation-policy</code> / sandbox seam</td>
+<td>tool-fs 里写业务分支</td>
+</tr>
+<tr>
+<td>新增侧栏面板</td>
+<td><code>packages/client/ui-*</code> + slot</td>
+<td>Host API 里塞 UI 状态</td>
+</tr>
+<tr>
+<td>改变系统提示结构</td>
+<td><code>packages/core/system-prompt</code> 的 section 注册</td>
+<td>在 loop 里拼字符串</td>
+</tr>
+<tr>
+<td>新增运行载体</td>
+<td>新 app + 复用 base/web bundle</td>
+<td>复制一套 core</td>
+</tr>
+<tr>
+<td>压缩上下文</td>
+<td><code>packages/compaction/*</code> 插件</td>
+<td>改 Session 日志格式</td>
+</tr>
+</tbody>
+</table>
+<h2>10. 架构练习</h2>
+<ol>
+<li>画出 <code>dsh --profile web</code> 从命令到 Web Host 监听的 6 个关键节点。</li>
+<li>画出 Desktop 从 Electron main 到 BrowserWindow 首次渲染的 7 个关键节点。</li>
+<li>选三个扩展点（工具、provider、client UI），各写一句“输入/输出/测试”。</li>
+<li>解释为什么“行顺序不是加载顺序”，并举一个 <code>inject</code> 的例子。</li>
+<li>一条 <code>tool/result</code> 应该由谁产生？它为什么不是“UI 自己拼出来的”？</li>
+</ol>
+<p>参考答案见 <a href="#answers">answer-key.zh.md</a> 的模块 2 部分。</p></div></section><section class="section" id="m3" data-section="m3"><div class="chapter"><div class="chapter-left"><div class="chapter-num">03</div><div><h2>代码实现</h2><p>沿真实文件追踪一次 turn，并做一个最小工具练习</p></div></div><button class="btn done-btn" type="button" data-done="m3">标记完成</button></div><div class="content">
+<p>目标：沿真实文件追踪一次启动和一次 turn；能新增一个只读工具，并用 <code>dump-config</code>、单元测试和事件日志证明它接对了。</p>
+<h2>1. 先准备可观察环境</h2>
+<pre><code class="language-sh">pnpm install
+pnpm dsh --profile web --dump-config &gt; /tmp/web-tree.yml
+pnpm dsh --profile web --dump-config-schema &gt; /tmp/web-schema.json
+</code></pre>
+<p><code>dump-config</code> 展示最终组合后的插件树；先学会看它，再去读源码，否则很容易把 base 的默认值和 web 的覆盖值混在一起。</p>
+<h2>2. 推荐阅读顺序</h2>
+<p>不要从 <code>packages</code> 里随机打开文件。按“入口 → 装配 → 驱动 → 持久化 → 载体 → 扩展”的顺序读：</p>
+<ol>
+<li><code>apps/cli/src/bin.ts</code>：命令如何分发。</li>
+<li><code>apps/cli/src/profile-boot.ts</code>：profile 如何启动。</li>
+<li><code>packages/boot/app-boot/src/profile.ts</code>：bundle/profile/patch 如何合并。</li>
+<li><code>packages/bundle/base/cordis.patch.yml</code>：共享底座的实际行。</li>
+<li><code>packages/bundle/web-app/cordis.patch.yml</code>：Web 载体如何覆盖 base。</li>
+<li><code>packages/core/agent-loop/src/agent.ts</code>：turn/step 驱动。</li>
+<li><code>packages/core/session/src/types.ts</code>：事件类型和日志约束。</li>
+<li><code>packages/core/tools/README.md</code>：工具注册契约。</li>
+<li><code>packages/fs/tool-fs/src/index.ts</code>：一个真实工具包的插件形态。</li>
+<li><code>packages/host/webserver</code> 与 <code>packages/client</code>：Host/Client 边界。</li>
+<li><code>apps/desktop/src/main.ts</code>、<code>apps/desktop-host/src/index.ts</code>：桌面载体。</li>
+</ol>
+<h2>3. 代码走读 1：CLI 只是分发器</h2>
+<p><code>apps/cli/src/bin.ts</code> 的 <code>runCli</code> 按 mode 分发：</p>
+<pre><code class="language-ts">switch (invocation.mode) {
+  case 'profile': {
+    const { runProfile } = await import('./profile-boot.ts')
+    await runProfile({ ... })
+    break
+  }
+  case 'plugin':
+    process.exit(await runPlugin(...))
+    break
+  case 'dump-config':
+    runDumpConfig(...)
+    break
+}
+</code></pre>
+<p>要点：</p>
+<ul>
+<li>参数解析和 profile 启动分开；<code>runCli</code> 不持有 Agent/Session。</li>
+<li>动态 import 让不相关的命令不必加载整个 Web/Desktop 依赖。</li>
+<li><code>dump-config</code> 和真正运行共用 profile 解析，因此它是可信的装配观察点。</li>
+<li>默认分支用 <code>satisfies never</code> 做穷尽检查；新增 mode 时编译器会提醒。</li>
+</ul>
+<h2>4. 代码走读 2：Bundle 是一组可覆盖的行</h2>
+<p><code>packages/bundle/base/cordis.patch.yml</code> 用 insert 声明共享服务：</p>
+<pre><code class="language-yaml">- insert:
+    - id: llm
+      name: '@deepseek-ai/dsh-llm'
+
+    - id: session
+      name: '@deepseek-ai/dsh-session'
+
+    - id: tools
+      name: '@deepseek-ai/dsh-tools'
+</code></pre>
+<p>Web 载体在 <code>packages/bundle/web-app/cordis.patch.yml</code> 里用同一个 id 覆盖配置：</p>
+<pre><code class="language-yaml">- id: tools
+  config:
+    mode: !!js process.env.DSH_TOOLS_MODE
+</code></pre>
+<p>要点：</p>
+<ul>
+<li><code>!!js</code> 是 Loader 的表达式，不是普通 YAML；它会在合适时机求值。</li>
+<li>行顺序不是加载顺序；插件靠 <code>inject</code> 等待服务。</li>
+<li>覆盖是整段 <code>config</code> 替换；要保留 base 的字段必须重写全部字段。</li>
+<li>新工具通常只需要在某个 bundle 里 <code>insert</code> 一行，不需要改 loop。</li>
+</ul>
+<h2>5. 代码走读 3：工具包长什么样</h2>
+<p><code>packages/fs/tool-fs/src/index.ts</code> 的插件形态：</p>
+<pre><code class="language-ts">export const name = 'tool-fs'
+export const inject = ['tools', 'fs', 'systemPrompt', 'workingDirectory']
+export interface Config { read?: boolean; write?: boolean; /* ... */ }
+export const Config = z.object({ /* defaults */ })
+export function apply(ctx: Context, config: Config): void {
+  // 校验 config，然后 applyReadTool/applyWriteTool/...
+}
+</code></pre>
+<p>工具注册本身用 <code>defineTool</code>（见 <code>packages/core/tools/README.md</code>）：</p>
+<pre><code class="language-ts">ctx.tools.register(defineTool({
+  name: 'read_file',
+  description: 'Read a file from disk.',
+  parameters: {
+    path: { type: 'string', required: true },
+    offset: { type: 'number' },
+  },
+  output: {
+    schema: { type: 'string' },
+    render: (_args, value) =&gt; [{ type: 'text', text: value }],
+  },
+  async execute(args, exec) {
+    return readFile(args.path, { encoding: 'utf8', signal: exec.signal })
+  },
+}))
+</code></pre>
+<p>要点：</p>
+<ul>
+<li>工具包只声明“模型能做什么”，具体文件后端是 <code>ctx.fs</code>；这就是 Definition/Provider/Consumer 的分层。</li>
+<li><code>parameters</code> 同时是模型 schema 和运行时校验来源；不要手写第二份。</li>
+<li><code>execute</code> 只返回声明的 canonical value；UI 展示由 <code>output.render</code>/presentation 负责。</li>
+<li>工具失败应返回结构化错误结果，不要用异常结束整个 turn，除非无法继续。</li>
+</ul>
+<h2>6. 代码走读 4：Agent Loop 的 turn/step</h2>
+<p><code>packages/core/agent-loop/src/agent.ts</code> 里核心是 <code>kick()</code> → <code>turn()</code> → <code>step()</code>：</p>
+<ul>
+<li><code>kick()</code>：在空闲时唤醒驱动，处理 inbox 中的输入。</li>
+<li><code>turn()</code>：建立 <code>turn/start</code>/<code>turn/end</code>，循环执行 step，直到完成/取消/失败。</li>
+<li><code>step()</code>：组装 prompt/tool schema，调用 LLM，处理 assistant 流和工具调用。</li>
+<li><code>prepareRequest()</code> / <code>buildRequest()</code>：把 Session 日志中可重建的上下文变成实际请求。</li>
+<li><code>toolsChanged()</code>：工具集变化会影响 prompt，需要重新组装。</li>
+</ul>
+<p>一个 step 结束不等于 turn 结束：工具结果可能需要再请求模型；因此 loop 会根据“是否还有工具要执行/是否有新输入”决定是否进入下一个 step。</p>
+<p>读这段时只问三个问题：</p>
+<ol>
+<li>这个函数在哪个事件边界内运行？</li>
+<li>它追加了哪些 Session 事件？</li>
+<li>它什么时候让出控制权给下一个 step/turn？</li>
+</ol>
+<h2>7. 代码走读 5：Session 事件是声明合并的</h2>
+<p><code>packages/core/session/src/types.ts</code> 定义基础事件；其他包通过 declaration merging 增加事件类型。例如 tools 包在 <code>packages/core/tools/src/types.ts</code> 里扩展 <code>SessionEventMap</code>：</p>
+<pre><code class="language-ts">declare module '@deepseek-ai/dsh-session/types' {
+  interface SessionEventMap {
+    'tool/ptc-dispatch-start': PtcDispatchStartEventData
+    'tool/ptc-dispatch': PtcDispatchEventData
+  }
+}
+</code></pre>
+<p>要点：</p>
+<ul>
+<li>事件 payload 是持久化数据，必须能用 JSON 表达；不要塞函数、类实例、循环引用。</li>
+<li>日志专用事件（log-only）不会进入 <code>deriveMessages()</code>，因此不会重新变成模型上下文。</li>
+<li>想让模型看到的新输入，必须同时设计它的事件和 <code>deriveMessages</code> 的读取路径；否则重放会丢。</li>
+<li>事件监听器用 <code>ctx.on</code> 注册，返回 disposer；插件卸载后不能继续写日志。</li>
+</ul>
+<h2>8. 代码走读 6：Desktop 与 Desktop Host</h2>
+<p><code>apps/desktop/src/main.ts</code> 是 Electron 壳：</p>
+<ul>
+<li>创建窗口、菜单、托盘、协议处理。</li>
+<li>用 <code>ELECTRON_RUN_AS_NODE=1</code> 启动 <code>apps/desktop-host</code>。</li>
+<li>接收 Host 的 <code>boot/ready</code> IPC，把端口/token 交给页面。</li>
+<li>Linux 上关闭自动更新入口，保持 <code>updatesSupported = process.platform !== 'linux'</code>。</li>
+</ul>
+<p><code>apps/desktop-host/src/index.ts</code> 是真正的 Host：</p>
+<ul>
+<li>以 Node 模式运行，加载 <code>desktop</code> profile。</li>
+<li>负责 Office 引擎、退出检查、平台会话、更新任务等桌面专属能力。</li>
+<li>它仍然复用 <code>base</code> + <code>web-app</code>，不是另一套 Agent。</li>
+</ul>
+<h2>9. 练习 A：新增只读工具 <code>repo_stats</code></h2>
+<p>目标：统计当前 workspace 中各扩展名的文件数，返回 JSON；不写文件、不执行命令。</p>
+<p>要求：</p>
+<ol>
+<li>新建一个插件包（学习分支可放 <code>packages/experimental/tool-repo-stats</code>，不要直接改 core）。</li>
+<li>导出 <code>name</code>、<code>inject = ['tools', 'workingDirectory']</code>、<code>Config</code>、<code>apply</code>。</li>
+<li>用 <code>defineTool</code> 注册 <code>repo_stats</code>：参数 <code>root?</code> 为字符串；输出 <code>{ extensions: Record&lt;string, number&gt;, total: number }</code>。</li>
+<li>用 Node <code>fs/promises</code> 遍历目录；跳过 <code>node_modules</code>、<code>.git</code>、<code>.desktop-build</code>；限制最大文件数并在结果中报告 <code>truncated</code>。</li>
+<li>在 <code>learning</code> 的本地测试分支的 base/学习 bundle patch 中 insert 一行，加载插件。</li>
+<li>写一个测试：注册后 <code>ctx.tools</code> 能看到 <code>repo_stats</code>，执行后返回正确计数；再 dispose 插件，确认工具消失。</li>
+</ol>
+<p>验收命令（按你的测试文件路径调整）：</p>
+<pre><code class="language-sh">pnpm exec vitest run packages/experimental/tool-repo-stats/tests/repo-stats.spec.ts
+pnpm run typecheck
+pnpm dsh --profile web --dump-config | grep repo-stats
+</code></pre>
+<h2>10. 练习 B：追踪一次 turn 的事件</h2>
+<p>在一个测试里创建 Agent（参考 <code>packages/core/agent/tests</code> 的 testkit 用法），让 mock LLM 先返回一个工具调用，再返回最终回答；断言事件顺序满足：</p>
+<pre><code class="language-text">turn/start -&gt; step/start -&gt; tool/call -&gt; tool/result -&gt; step/end -&gt; step/start -&gt; assistant/message -&gt; step/end -&gt; turn/end
+</code></pre>
+<p>然后回答：</p>
+<ol>
+<li>哪些事件是模型可见的，哪些是 log-only？</li>
+<li>如果把 <code>tool/result</code> 从 <code>deriveMessages</code> 中删掉，会发生什么？</li>
+<li>取消发生在第一个 step 后时，哪些事件必须仍然成对？</li>
+</ol>
+<h2>11. 练习 C：观察装配覆盖</h2>
+<ol>
+<li>用 <code>--dump-config</code> 导出 web 和 desktop 两个 profile 的树。</li>
+<li>找到 <code>tools</code>、<code>session</code>、<code>system-prompt</code> 三行，比较两个 profile 的 <code>config</code>。</li>
+<li>解释哪些差异来自 base，哪些来自 web-app，哪些来自 desktop 专属 patch。</li>
+<li>用 <code>--patch</code> 临时覆盖一个字段，再导出，确认只有目标行变化。</li>
+</ol>
+<h2>12. 代码阅读自测</h2>
+<ol>
+<li><code>runCli</code> 为什么用动态 import 分支？这会影响启动时间吗？</li>
+<li><code>inject</code> 和 YAML 行顺序，哪个决定插件何时激活？</li>
+<li><code>ctx.tools.register</code>、<code>ctx.effect</code>、<code>defineTool</code> 三者的职责分别是什么？</li>
+<li>Session 事件为什么不能直接存 <code>Error</code> 对象？</li>
+<li>Desktop Host 和 Web Host 的代码边界在哪里？为什么 Desktop main 不直接跑 Agent？</li>
+<li>一个工具调用失败时，为什么通常不应直接结束 turn？</li>
+</ol>
+<p>参考答案见 <a href="#answers">answer-key.zh.md</a> 的模块 3 部分。</p></div></section><section class="section" id="m4" data-section="m4"><div class="chapter"><div class="chapter-left"><div class="chapter-num">04</div><div><h2>迁移能力测评</h2><p>术语 6 + 架构 7 + 代码 7；再选两个迁移任务</p></div></div><button class="btn done-btn" type="button" data-done="m4">标记完成</button></div>
+<div class="answer-card" id="answer-card">
+  <h2>结课答题卡</h2>
+  <p class="hint">先完成模块 1–3，再做下面 20 题和 C1–C4 中的 2 题。答案保存在本机浏览器，可导出为 Markdown 发给我评分。</p>
+  <label for="final-answers"><strong>20 题答案</strong>（题号 + 你的回答）</label>
+  <textarea class="big-answer" id="final-answers" data-big="final" placeholder="1. …&#10;2. …"></textarea>
+  <label for="transfer-answers" style="display:block;margin-top:12px"><strong>迁移任务答案</strong>（写“选 C1/C2…”+ 方案）</label>
+  <textarea class="big-answer" id="transfer-answers" data-big="transfer" placeholder="选 C1…&#10;…"></textarea>
+  <div class="row-actions">
+    <button class="btn primary" type="button" onclick="saveAnswers()">保存答案</button>
+    <button class="btn" type="button" onclick="exportAnswers()">复制 / 下载为 Markdown</button>
+    <span class="status" id="answer-status-2">未保存</span>
+  </div>
+</div>
+<div class="content">
+<p>目标：不是复述 DSH 的目录，而是判断一个<strong>没见过的新需求</strong>应该改哪里、为什么、怎么验证。</p>
+<h2>使用方式</h2>
+<ul>
+<li>开始学习前先做“诊断 8 题”，不查资料，写 1-2 句话即可。</li>
+<li>学完模块 1-3 后做“结课 20 题 + 迁移任务”。</li>
+<li>把答案发给我，我按 rubric 评分；代码题可以直接给分支/文件路径。</li>
+</ul>
+<h2>A. 诊断 8 题（不计分）</h2>
+<ol>
+<li>Turn 和 Step 的区别是什么？</li>
+<li>Plugin、Service、Tool 三者各是什么？</li>
+<li>Profile、Bundle、Patch 三者如何组合？</li>
+<li>“模型可见 ⟺ logged”具体约束了什么？</li>
+<li>Host 和 Client 各自负责什么？</li>
+<li><code>ctx.effect</code> 解决了什么问题？</li>
+<li>为什么 Session 日志不能只是 UI 缓存？</li>
+<li>要新增一个“查数据库”的模型工具，你会先改哪个目录？</li>
+</ol>
+<h2>B. 结课 20 题（每题 1 分）</h2>
+<h3>术语（6）</h3>
+<ol>
+<li>解释 capability seam，并用 sandbox 举例。</li>
+<li>Service Definition 和 Provider 的区别是什么？</li>
+<li>为什么说 Profile 是装配结果，不是用户设置？</li>
+<li>Bundle 和 npm package 的关系是什么？</li>
+<li>Tool 和 Skill 的边界是什么？</li>
+<li>为什么 Desktop Host 不是 Electron main？</li>
+</ol>
+<h3>架构（7）</h3>
+<ol start="7">
+<li>写出 CLI 从 <code>dsh --profile web</code> 到 Web Host 监听的 6 个关键节点。</li>
+<li>写出 Desktop 从 Electron main 到页面首次渲染的 7 个关键节点。</li>
+<li>为什么 Cordis 配置行的顺序不是加载顺序？</li>
+<li>覆盖一个 <code>id</code> 行时，<code>config</code> 是深合并还是整段替换？这有什么后果？</li>
+<li>一次 turn 中，什么情况下会进入第二个 step？</li>
+<li>哪些内容必须能从 Session 日志重建？举两个例子。</li>
+<li>Client 为什么不能直接读 Host 的文件系统？</li>
+</ol>
+<h3>代码（7）</h3>
+<ol start="14">
+<li><code>runCli</code> 的 switch 里，<code>dump-config</code> 与 <code>profile</code> 为什么能共用 profile 解析？</li>
+<li><code>ctx.tools.register</code>、<code>defineTool</code>、<code>ctx.effect</code> 各自负责什么？</li>
+<li><code>inject</code> 声明和工具执行时的服务查找是什么关系？</li>
+<li>工具失败时，为什么通常返回 <code>tool/result</code> 而不是抛异常结束 turn？</li>
+<li>新增一个 log-only Session 事件，需要改哪些类型/投影/测试？</li>
+<li><code>agent.ts</code> 的 <code>turn()</code> 和 <code>step()</code> 各自负责什么边界？</li>
+<li>如果要在不修改 core 的情况下新增一个只读工具，列出你要新增/修改的文件和验证命令。</li>
+</ol>
+<h2>C. 迁移任务（每题 10 分，选 2 题）</h2>
+<h3>C1. 新工具迁移</h3>
+<p>给一个已有 TypeScript 项目加“数据库 schema 检查”工具，要求：</p>
+<ul>
+<li>模型可以调用，参数有 <code>connection</code>、<code>schema</code>；</li>
+<li>只读，不能写数据库；</li>
+<li>结果有稳定错误码；</li>
+<li>不修改 agent-loop/session 核心。</li>
+</ul>
+<p>写出：插件包结构、<code>inject</code>、<code>defineTool</code> 草案、bundle 行、测试计划、风险。</p>
+<h3>C2. 新 Provider 迁移</h3>
+<p>为 DSH 接入一个新的模型供应商（支持流式输出和工具调用）。写出：</p>
+<ul>
+<li>需要实现/复用的接口；</li>
+<li>认证和错误重试放在哪；</li>
+<li>请求头如何记录实际 model/reasoning；</li>
+<li>需要哪些测试（mock/真实 API/回放）；</li>
+<li>哪些东西绝对不要改。</li>
+</ul>
+<h3>C3. 新载体迁移</h3>
+<p>把 DSH 接到一个新的本地 HTTP daemon（无 Electron、无浏览器 UI），复用 base + headless/web 能力。写出：</p>
+<ul>
+<li>新 app 的入口和 profile；</li>
+<li>与 Host 的生命周期/退出/信号处理；</li>
+<li>会话持久化和日志路径；</li>
+<li>与现有 CLI/Desktop 的复用边界；</li>
+<li>最小验收清单。</li>
+</ul>
+<h3>C4. 故障诊断迁移</h3>
+<p>线上现象：用户发了一条消息，模型看到了，但刷新后这条消息消失；同时工具调用记录还在。根据 DSH 的不变式，列出最可能的 3 个原因、排查顺序和修复位置。</p>
+<h2>D. 评分 rubric</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>术语准确</td>
+<td>混淆核心概念</td>
+<td>部分正确</td>
+<td>基本准确</td>
+<td>能区分近义概念并举例</td>
+</tr>
+<tr>
+<td>架构定位</td>
+<td>不知道改哪里</td>
+<td>能指出大目录</td>
+<td>能指出 seam/包</td>
+<td>能画出调用链和事件边界</td>
+</tr>
+<tr>
+<td>代码可实施</td>
+<td>无法落地</td>
+<td>有伪代码</td>
+<td>有文件/接口/测试</td>
+<td>考虑回滚、失败、日志、验证</td>
+</tr>
+<tr>
+<td>迁移判断</td>
+<td>只会照抄</td>
+<td>能套用相似场景</td>
+<td>能解释为什么</td>
+<td>能指出不适用条件和风险</td>
+</tr>
+</tbody>
+</table>
+<p>结课通过线：20 题 ≥ 16 分，且 C 部分至少一题 ≥ 7 分。低于通过线不是失败，而是下一轮的学习清单。</p>
+<h2>E. 提交格式</h2>
+<p>直接回复：</p>
+<pre><code class="language-text">诊断：1... 8...
+结课：1... 20...
+迁移：选 C?，答案...
+</code></pre>
+<p>也可以只发代码分支和测试结果；我会按 rubric 给出得分、错因和下一步练习。</p></div></section><section class="section" id="answers" data-section="answers"><div class="chapter"><div class="chapter-left"><div class="chapter-num">A</div><div><h2>参考答案</h2><p>建议做完题再展开</p></div></div><button class="btn done-btn" type="button" data-done="answers">标记完成</button></div><div class="content"><details class="answer-box"><summary>展开参考答案（学完再看）</summary>
+<p>先做完题再看。这里给的是“可接受的答案骨架”，不是唯一措辞；评分看概念是否准确、边界是否清楚。</p>
+<h2>模块 1：术语</h2>
+<h3>闭卷自测</h3>
+<ol>
+<li>Turn 是一轮用户可见请求；Step 是其中一次模型请求及其工具阶段。一个 turn 可含多个 step。</li>
+<li>任何模型可见输入都必须能从 Session 日志重建，否则恢复/回放/审计会丢上下文。反例：只在内存里追加一段 prompt，没有对应事件。</li>
+<li>Bundle 提供可复用配置行；Profile 是有序选择 bundle 并叠加自己 patch 的装配；Patch 是按 id 覆盖的 YAML 层。</li>
+<li>Sandbox：<code>dsh-sandbox</code> 定义、<code>dsh-sandbox-local</code> 提供、<code>tool-bash-sandbox</code> 消费。</li>
+<li>Electron main 只做窗口/壳；Desktop Host 是运行 Cordis 与 Session 的 Node 子进程。</li>
+<li>Tool 是模型可调用的动作；Skill 是可加载的知识/流程，通常通过 skill 工具读取，可能再调用工具。</li>
+<li>不能。Projection 从日志派生，日志才是事实源；删掉日志再重建 projection 会丢事实。</li>
+<li>Effect 把注册和清理绑定到插件/fiber 生命周期；手工 removeListener 容易漏掉异常路径、重复注册和卸载顺序。</li>
+</ol>
+<h3>纠错练习</h3>
+<ol>
+<li>一个 turn 可以包含多个 step（工具结果后再次请求）。</li>
+<li>Plugin 是加载单位；Tool 是它可能注册的模型能力，二者不等价。</li>
+<li>反了：Bundle 是 npm 包中的配置行，Profile 是用户目录下的运行装配。</li>
+<li>反了：Session 日志是事实源，Projection 是派生读模型。</li>
+<li>错。Desktop 与 Web 共用 base、Agent Loop、Session、Tools；Desktop 只是不同载体。</li>
+</ol>
+<h2>模块 2：架构</h2>
+<h3>练习题要点</h3>
+<ol>
+<li>命令 → args → profile-boot → app-boot/Loader → profile+bundles+patches → web bundle 激活 → webServer 监听。</li>
+<li>Electron main → 创建 BrowserWindow → spawn Desktop Host → 加载 desktop profile → Web Host 监听 → IPC boot/ready → 页面连接 API/WS → 首次渲染。</li>
+<li>示例：工具=输入 schema、输出 canonical value、测试注册+执行+dispose；provider=输入请求、输出流、测试 mock/真实 API；client UI=输入投影、输出组件、测试 slot 注册/卸载。</li>
+<li>因为 Loader 按 <code>inject</code> 和 service 可用性激活；行顺序只影响同 id 覆盖结果，不是执行顺序。</li>
+<li>由工具执行/工具注册表产生并写入 Session；UI 只能渲染结果，不能自己伪造事实。</li>
+</ol>
+<h2>模块 3：代码</h2>
+<h3>自测</h3>
+<ol>
+<li>动态 import 让未用到的命令不加载重依赖；会影响启动路径，但按 mode 分摊。</li>
+<li><code>inject</code> 决定依赖和服务可用性；行顺序不决定激活顺序。</li>
+<li><code>defineTool</code> 定义 schema/execute/output；<code>ctx.tools.register</code> 注册到服务；<code>ctx.effect</code> 管生命周期/回滚（工具注册通常也由 registry 的注册机制处理）。</li>
+<li>事件 payload 必须是可持久化 JSON；Error 含栈/非枚举字段，无法可靠重放。</li>
+<li>Desktop Host 负责 Host 能力和桌面专属能力；main 只做壳，避免把插件树塞进 Electron 主进程。</li>
+<li>普通工具失败是可恢复的模型输入；让它看到错误并决定下一步，比直接终止 turn 更有用。</li>
+</ol>
+<h3>练习 A 参考结构</h3>
+<ul>
+<li><code>packages/experimental/tool-repo-stats/src/index.ts</code>：导出 <code>name</code>、<code>inject</code>、<code>Config</code>、<code>apply</code>；<code>apply</code> 里 <code>ctx.tools.register(defineTool({...}))</code>。</li>
+<li><code>parameters</code>：<code>root?</code>；<code>output</code>：扩展名计数与 total/truncated。</li>
+<li>遍历时限制深度/文件数，跳过 node_modules/.git/.desktop-build；错误用稳定 code。</li>
+<li>bundle patch：<code>- insert: - id: tool-repo-stats name: '@your-scope/dsh-tool-repo-stats'</code>。</li>
+<li>测试：注册可见、执行计数、dispose 后消失；真实 Loader composition 测试优于手搭 ctx。</li>
+</ul>
+<h3>练习 B 参考顺序</h3>
+<p><code>turn/start → step/start → tool/call → tool/result → step/end → step/start → assistant/message → step/end → turn/end</code>；取消时 turn/step 仍要成对收尾，工具调用要么落 result，要么落取消结果。</p>
+<h2>结课 20 题评分要点</h2>
+<ul>
+<li>每题 1 分，关键词命中即可；不要求逐字。</li>
+<li>第 7/8 题节点缺失超过 2 个记 0.5；能说清 Host 与 Client 边界即可。</li>
+<li>第 10 题必须指出“整段 config 替换”，否则 0.5。</li>
+<li>第 18 题至少提到：事件类型声明合并、payload 可 JSON、是否进 <code>deriveMessages</code>、投影/测试。</li>
+<li>第 20 题必须包含“新增包 + inject + defineTool + bundle 行 + 测试”，缺 bundle 或测试各扣 0.5。</li>
+</ul>
+<h2>迁移任务评分</h2>
+<ul>
+<li>C1：看是否只读、schema 与 execute 一致、错误码、是否改 core、测试覆盖 dispose。</li>
+<li>C2：看流式/工具调用适配、认证/重试位置、请求头记录、测试策略、是否误改 session/loop。</li>
+<li>C3：看生命周期/信号/退出、持久化路径、复用 base/headless、验收清单。</li>
+<li>C4：高分答案会按“日志是否写入/是否可 derive/投影是否读同一事件/客户端是否只读缓存”排查，而不是先猜 UI bug。</li>
+</ul>
+<p>通过线：20 题 ≥16，且 C 至少一题 ≥7/10。未通过时，按错题回到对应模块，不要求重读整门课。</p></details></div></section>
+      <div class="footer">由 DeepSeek Harness 学习课生成 · 自包含 HTML，无外部依赖 · 源文件在 <code>learning/</code> · 仓库：github.com/lsp725jk/deepseek-harness-linux</div>
+    </div>
+  </main>
+</div>
+<script>
+(function () {
+  var root = document.documentElement;
+  var KEY = 'dsh-learning-answers-v1';
+  var PROGRESS = 'dsh-learning-progress-v1';
+  var THEME = 'dsh-learning-theme';
+
+  function readStore(key, fallback) {
+    try { var value = localStorage.getItem(key); return value ? JSON.parse(value) : fallback; }
+    catch (error) { return fallback; }
+  }
+  function writeStore(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (error) { /* storage may be unavailable */ }
+  }
+  function allAnswers() {
+    var data = readStore(KEY, {});
+    document.querySelectorAll('[data-diag]').forEach(function (el) { data['diag-' + el.dataset.diag] = el.value; });
+    document.querySelectorAll('[data-big]').forEach(function (el) { data['big-' + el.dataset.big] = el.value; });
+    return data;
+  }
+  function restoreAnswers() {
+    var data = readStore(KEY, {});
+    document.querySelectorAll('[data-diag]').forEach(function (el) { el.value = data['diag-' + el.dataset.diag] || ''; });
+    document.querySelectorAll('[data-big]').forEach(function (el) { el.value = data['big-' + el.dataset.big] || ''; });
+  }
+  function saveAnswers() {
+    writeStore(KEY, allAnswers());
+    document.querySelectorAll('#answer-status, #answer-status-2').forEach(function (el) { el.textContent = '已保存到本机 · ' + new Date().toLocaleTimeString(); });
+  }
+  function answerText() {
+    var data = allAnswers();
+    var lines = ['# DeepSeek Harness 学习答案', '', '## 诊断 5 题', ''];
+    for (var i = 1; i <= 5; i += 1) {
+      lines.push(i + '. ' + (document.querySelector('[data-diag="' + i + '"]').closest('.q').querySelector('label').textContent.replace(/^[0-9]+\.\s*/, '') || ''));
+      lines.push('   ' + (data['diag-' + i] || '（未答）'), '');
+    }
+    lines.push('## 结课 20 题', '', data['big-final'] || '（未答）', '');
+    lines.push('## 迁移任务', '', data['big-transfer'] || '（未答）', '');
+    return lines.join('\n');
+  }
+  function downloadMarkdown() {
+    var text = answerText();
+    var blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'dsh-learning-answers.md'; a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function exportAnswers() {
+    var text = answerText();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { downloadMarkdown(); }).catch(function () { downloadMarkdown(); });
+    } else { downloadMarkdown(); }
+  }
+  window.saveAnswers = saveAnswers;
+  window.exportAnswers = exportAnswers;
+
+  document.querySelectorAll('[data-diag], [data-big]').forEach(function (el) {
+    el.addEventListener('input', function () { saveAnswers(); });
+  });
+  restoreAnswers();
+
+  var progress = readStore(PROGRESS, {});
+  function renderProgress() {
+    var total = document.querySelectorAll('[data-done]').length;
+    var done = 0;
+    document.querySelectorAll('[data-done]').forEach(function (btn) {
+      var id = btn.dataset.done;
+      var isDone = !!progress[id];
+      btn.classList.toggle('done', isDone);
+      btn.textContent = isDone ? '已完成 ✓' : '标记完成';
+      if (isDone) { done += 1; }
+    });
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = done + ' / ' + total + ' 节';
+  }
+  document.querySelectorAll('[data-done]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      progress[btn.dataset.done] = !progress[btn.dataset.done];
+      writeStore(PROGRESS, progress);
+      renderProgress();
+    });
+  });
+  renderProgress();
+
+  var theme = localStorage.getItem(THEME);
+  if (theme === 'dark') { root.dataset.theme = 'dark'; }
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    root.dataset.theme = root.dataset.theme === 'dark' ? '' : 'dark';
+    localStorage.setItem(THEME, root.dataset.theme || 'light');
+    this.textContent = root.dataset.theme === 'dark' ? '浅色' : '深色';
+  });
+  if (root.dataset.theme === 'dark') { document.getElementById('theme-toggle').textContent = '浅色'; }
+
+  document.getElementById('menu-toggle').addEventListener('click', function () {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+  document.querySelectorAll('.nav a').forEach(function (a) {
+    a.addEventListener('click', function () { document.getElementById('sidebar').classList.remove('open'); });
+  });
+
+  document.querySelectorAll('.content table').forEach(function (table) {
+    var wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+  });
+
+  document.querySelectorAll('.content pre').forEach(function (pre) {
+    var button = document.createElement('button');
+    button.className = 'copy-code'; button.type = 'button'; button.textContent = '复制';
+    button.addEventListener('click', function () {
+      var code = pre.querySelector('code');
+      if (!code) { return; }
+      var text = code.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { button.textContent = '已复制'; setTimeout(function () { button.textContent = '复制'; }, 1200); });
+      }
+    });
+    pre.appendChild(button);
+  });
+
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section[data-section]'));
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) { return; }
+        document.querySelectorAll('.nav a').forEach(function (a) { a.classList.toggle('active', a.dataset.nav === entry.target.id); });
+      });
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0.01 });
+    sections.forEach(function (section) { observer.observe(section); });
+  }
+  document.getElementById('print-btn').addEventListener('click', function () { window.print(); });
+})();
+</script>
+</body>
+</html>
