@@ -57,6 +57,10 @@ pnpm --dir apps/desktop run package:linux:x64:unsigned
 
 需要 Node 24.21.0、pnpm 11.28.5，以及 GTK/NSS/GBM/X11/ALSA 等 Electron 运行库；完整步骤见 [docs/linux/BUILD.zh.md](docs/linux/BUILD.zh.md)。
 
+## GitHub Actions
+
+仓库内的 [.github/workflows/linux-desktop.yml](.github/workflows/linux-desktop.yml) 会在 push 到 `main`、推送 `v*` tag 或手动触发时，在 Ubuntu 22.04 x64 上构建未签名 AppImage/deb，并上传 Actions artifact；tag 构建会同时发布 GitHub Release。
+
 ## 当前限制
 
 - 产物未签名；没有自动更新 feed；Linux 隐藏“检查更新”入口。

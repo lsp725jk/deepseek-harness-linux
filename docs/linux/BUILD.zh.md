@@ -116,3 +116,12 @@ dsh web --port 3080
 ```
 
 架构与代码边界见 `docs/analysis/deepseek-harness-architecture.zh.md`；限制见 `docs/linux/LIMITATIONS.zh.md`。
+## GitHub Actions 自动构建
+
+工作流：[.github/workflows/linux-desktop.yml](../../.github/workflows/linux-desktop.yml)。
+
+- 触发：push 到 `main`、推送 `v*` tag、手动 `workflow_dispatch`。
+- Runner：`ubuntu-22.04` x64；安装 Electron 运行库并清理磁盘后，执行 `pnpm install --frozen-lockfile` 和 `package:linux:x64:unsigned`。
+- 产物：AppImage、deb、`SHA256SUMS`；先作为 Actions artifact 保留 14 天。
+- tag 构建：用 `softprops/action-gh-release` 创建/更新 pre-release，并上传同样的三个文件。
+- 工作流不读取签名密钥、更新密钥或 COS 凭据，只构建未签名产物；arm64、签名和自动更新见 [ROADMAP.zh.md](ROADMAP.zh.md)。
