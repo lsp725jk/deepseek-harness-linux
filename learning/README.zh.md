@@ -1,6 +1,8 @@
 # DeepSeek Harness 学习与迁移课
 
 > **用户阅读版（推荐）：[index.html](index.html)** — 自包含 HTML，带目录、进度、答题卡和答案导出；下面这些 Markdown 是 Agent/仓库维护用的源文件。
+>
+> 在线版：<https://lsp725jk.github.io/deepseek-harness-linux/>。修改 MD 后运行 `python learning/build-html.py` 重新生成 HTML，并把 `index.html` 同步到 `gh-pages` 分支的根目录。
 
 这是一套面向开发者的三模块课程：先建立术语，再建立架构地图，最后读代码并做小改动；学完后用迁移测试检验是否真的理解，而不是记住结论。
 
