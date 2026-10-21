@@ -6,7 +6,7 @@ English | [中文](README.zh.md)
 
 [![Linux desktop package](https://github.com/lsp725jk/deepseek-harness-linux/actions/workflows/linux-desktop.yml/badge.svg)](https://github.com/lsp725jk/deepseek-harness-linux/actions/workflows/linux-desktop.yml)
 >
-> **学习与迁移课:** see [learning/README.zh.md](learning/README.zh.md) for terminology, architecture, code reading, and assessment.
+> **学习与迁移课:** open the [HTML course](learning/index.html) for reading, progress, and answer export; the [Markdown index](learning/README.zh.md) is the source for agents and maintainers.
 
 DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
 

@@ -65,7 +65,7 @@ pnpm --dir apps/desktop run package:linux:x64:unsigned
 
 ## 学习与迁移
 
-三模块学习课（术语、架构、代码实现）与迁移测评在 [learning/README.zh.md](learning/README.zh.md)；答案在 [learning/answer-key.zh.md](learning/answer-key.zh.md)。
+三模块学习课（术语、架构、代码实现）与迁移测评：用户阅读版 [learning/index.html](learning/index.html)；Agent/维护版 [learning/README.zh.md](learning/README.zh.md)；答案 [learning/answer-key.zh.md](learning/answer-key.zh.md)。
 
 ## 当前限制
 
