@@ -1,5 +1,13 @@
 name: E2E (real DeepSeek API)
 
+# FORK LOCAL — this tree is a Linux port of DeepSeek Harness and does not carry
+# the DEEPSEEK_API_KEY_EXTERNAL secret, so every automatic trigger would fail the
+# preflight below. Only manual dispatch remains; the preflight is unchanged, so a
+# dispatched run still fails loud instead of reporting a false green. The
+# comments after this banner describe the upstream trigger policy (push,
+# pull_request, nightly schedule) that this fork turned off; restore that block
+# from upstream before relying on it here.
+#
 # Real-API end-to-end suite (`pnpm run test:e2e`). Unlike ci.yml this job
 # consumes the DEEPSEEK_API_KEY_EXTERNAL secret (mapped to the env var
 # DEEPSEEK_API_KEY the tests read) and hits the external API at
@@ -29,12 +37,6 @@ name: E2E (real DeepSeek API)
 # push/pull_request/workflow_dispatch act as backstops.
 on:
   workflow_dispatch:
-  push:
-    branches: [main, master]
-  pull_request:
-  schedule:
-    # 00:17 UTC nightly = 08:17 Asia/Shanghai — off the top-of-hour cron stampede.
-    - cron: '17 0 * * *'
 
 # Keep only the newest validation in each workflow/ref, including master
 # pushes, nightly runs, and manual dispatches.
